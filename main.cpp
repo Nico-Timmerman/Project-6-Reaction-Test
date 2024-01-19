@@ -17,7 +17,8 @@ using namespace crow; // Saves us writing crow:: all the time
  * This code is reused from Mobile Networking Lab 10, when reading comments should any pertain to a "REQ #" see that asn document to understand it
  * 
  * Things not relevant to this file:
- * The html pages, CSS, etc will all need to be changed and updated to achieve our WebProject's goal.
+ * The html pages, CSS, etc will all need to be changed and or updated to achieve our WebProject's goal.
+ * E.g. Index.html should stay, but it's content should be updated to reflect our Project.
 */
 
 
@@ -96,6 +97,9 @@ int main()
 			helperImages(res, filename); //Pass to helper then "parent"
 		});
 
+
+
+
 	// REQ5 Route
 	CROW_ROUTE(app, "/<int>/<string>").methods(HTTPMethod::Post)
 		([](const request& req, response& res, int a, string b) {
@@ -171,6 +175,19 @@ int main()
 			}
 			res.end();
 		});
+		
+		
+	/*
+	 * 
+	 Routes required:		Completetion Status:
+	 GET 					— Not Done (Part of Networking Lab10)
+	 POST					— Not Done (Part of Networking Lab10)
+	 PUT					— Not Done
+	 PATCH					— Not Done
+	 DELETE					— Not Done
+	 OPTIONS				— Not Done
+	*/
+	
 
 	// Generic HTML route
 	CROW_ROUTE(app, "/<string>")
