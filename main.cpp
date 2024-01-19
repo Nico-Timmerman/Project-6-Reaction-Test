@@ -15,6 +15,7 @@ using namespace crow; // Saves us writing crow:: all the time
  * -currently supports POST requests as well as GET requests
  * 
  * This code is reused from Mobile Networking Lab 10, when reading comments should any pertain to a "REQ #" see that asn document to understand it
+ * It may not have been requested but adding data sanitation to user fields seems like it would also be a good idea (at least a little bit).
  * 
  * Things not relevant to this file:
  * The html pages, CSS, etc will all need to be changed and or updated to achieve our WebProject's goal.
@@ -69,6 +70,8 @@ void helperImages(response& res, string filename) {
 	sendFile(res, "images/" + filename, "image/jpg"); // Specifies that we want to move out of the root/public directory into the images directory
 }
 
+
+
 int main()
 {
 	SimpleApp app; //This initializes our application named "app" which is an object of type SimpleApp from the crow library
@@ -96,7 +99,6 @@ int main()
 		([](const request& req, response& res, string filename) {
 			helperImages(res, filename); //Pass to helper then "parent"
 		});
-
 
 
 
@@ -178,7 +180,6 @@ int main()
 		
 		
 	/*
-	 * 
 	 Routes required:		Completetion Status:
 	 GET 					— Not Done (Part of Networking Lab10)
 	 POST					— Not Done (Part of Networking Lab10)
@@ -188,6 +189,51 @@ int main()
 	 OPTIONS				— Not Done
 	*/
 	
+	//GET method Route
+	/*CROW_ROUTE(app, "").methods(HTTPMethod::GET)
+		([](const request& req, response& res) {
+			//Do stuff
+		}); */
+		
+	//POST method Route
+	/*CROW_ROUTE(app, "").methods(HTTPMethod::POST)
+		([](const request& req, response& res) {
+			//Do stuff
+		}); */
+		
+	//PUT method Route
+	//A good usage of the PUT Method may be to "Create" the user accounts, since PUT is indempotent then calling it multiple 
+		//-times will always produce the same result, where as calling POST multiple times will create the resource multiple times.
+	/*CROW_ROUTE(app, "").methods(HTTPMethod::PUT)
+		([](const request& req, response& res) {
+			//Do stuff
+		}); */
+		
+	//PATCH method Route
+	//As I understand currently the idea is to update only part of the the user login resource 
+		//(i.e. updating a users password but not username)
+	/*CROW_ROUTE(app, "").methods(HTTPMethod::PATCH)
+		([](const request& req, response& res) {
+			//Do stuff
+		}); */
+		
+	//DELETE method Route
+	//A good usage of the DELETE Method may be to "reset" a users high score, whether this be an admin-only tool, 
+		//-or available to all users is undetermined
+	/*CROW_ROUTE(app, "").methods(HTTPMethod::DELETE)
+		([](const request& req, response& res) {
+			//Do stuff
+		}); */
+		
+	//OPTIONS method Route
+	//If my understanding is correct the technically this method should be allowed in addition to the others
+	//E.g. this method shows what other methods are available, without acting on the resource, so maybe use it in conjunction
+		// with the login page's routing?
+	/*CROW_ROUTE(app, "").methods(HTTPMethod::OPTIONS)
+		([](const request& req, response& res) {
+			//Do stuff
+		}); */
+
 
 	// Generic HTML route
 	CROW_ROUTE(app, "/<string>")
