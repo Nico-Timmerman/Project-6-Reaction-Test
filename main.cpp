@@ -9,12 +9,27 @@ using namespace crow; // Saves us writing crow:: all the time
 
 /*
  * LUCKILY Our purposes allow us to reuse much code from our previous personal website endeavour
+ * While this is true, much of this code as of present needs to be stripped as it has little to do with our project.
+ * 
+ * In a update soon the back-end requirements that are not currently met will be added here, as of right now the back-end
+ * -currently supports POST requests as well as GET requests
+ * 
+ * This code is reused from Mobile Networking Lab 10, when reading comments should any pertain to a "REQ #" see that asn document to understand it
+ * 
+ * Things not relevant to this file:
+ * The html pages, CSS, etc will all need to be changed and updated to achieve our WebProject's goal.
 */
 
 
-/* Credit where it's due: this elegant solution was found on the web,
- * It chains multiple helper functions that handle the TYPES (script/html/etc) and then passes them to this pseudo-parent function
-*/
+//// Template Route
+	//CROW_ROUTE(app, "")
+	//	([](const request& req, response& res) {
+	//		//Do stuff
+	//	});
+
+
+// This function chains off of our multiple helper functions that handle the TYPES (script/html/etc) 
+// and functions as a pseudo-parent function to save code on repeated calls.
 void sendFile (response& res, string filename, string contentType) {
 	ifstream in("../public/" + filename, ifstream::in);
 	if (in) {
@@ -162,14 +177,7 @@ int main()
 		([](const request& req, response& res, string filename) {
 			helperHTML(res, filename); //Pass to helper then "parent"
 		});
-
 		
-	//// Template Route
-	//CROW_ROUTE(app, "")
-	//	([](const request& req, response& res) {
-	//		//Do stuff
-	//	});
-
 	app.port(23500).multithreaded().run(); //Here we get the app object to declare a port, that the site should run on multiple threads, and tell it to run!
 	return 1;
 }
