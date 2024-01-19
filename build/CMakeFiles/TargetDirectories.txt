@@ -1,0 +1,3 @@
+/SharedVolume/build/CMakeFiles/Lab10.dir
+/SharedVolume/build/CMakeFiles/edit_cache.dir
+/SharedVolume/build/CMakeFiles/rebuild_cache.dir

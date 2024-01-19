@@ -1,0 +1,3 @@
+/DockerSharedVolume/build/CMakeFiles/hello_CSCN.dir
+/DockerSharedVolume/build/CMakeFiles/edit_cache.dir
+/DockerSharedVolume/build/CMakeFiles/rebuild_cache.dir
