@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(Lab10)
+project(Project6)
 
 set(CMAKE_CXX_STANDARD 20)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -9,5 +9,5 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(Threads)
 
 include_directories(${Boost_INCLUDE_DIRS})
-add_executable(Lab10 main.cpp)
-target_link_libraries(Lab10 ${Boost_LIBRARIES} Threads::Threads)
+add_executable(Project6 main.cpp)
+target_link_libraries(Project6 ${Boost_LIBRARIES} Threads::Threads)

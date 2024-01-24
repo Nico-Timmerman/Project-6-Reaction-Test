@@ -181,12 +181,12 @@ int main()
 		
 	/*
 	 Routes required:		Completetion Status:
-	 GET 					— Not Done (Part of Networking Lab10)
-	 POST					— Not Done (Part of Networking Lab10)
-	 PUT					— Not Done
-	 PATCH					— Not Done
-	 DELETE					— Not Done
-	 OPTIONS				— Not Done
+	 GET 					- Not Done (Part of Networking Lab10)
+	 POST					- Not Done (Part of Networking Lab10)
+	 PUT					- Not Done
+	 PATCH					- Not Done
+	 DELETE					- Not Done
+	 OPTIONS				- Not Done
 	*/
 	
 	//GET method Route
