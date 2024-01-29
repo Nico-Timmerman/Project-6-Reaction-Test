@@ -72,11 +72,10 @@ int main()
 {
 	SimpleApp app; //This initializes our application named "app" which is an object of type SimpleApp from the crow library
 
-	//Our default route. This should always return the Index.html file
-	CROW_ROUTE(app, "/") // Default Route/Root directory
-		([](const request &req, response &res) { // Doesn't need filename as a param because we'll never use a page other than Index.html for our default
-			sendFile(res, "Index.html", "text/html"); // Index.html should ALWAYS be our default webpage and as such we know it's details enough to just send straight 
-		});										  // -to the parent function, rather than the helper
+    CROW_ROUTE(app, "/")
+        ([](const request &req, response &res) {
+            sendFile(res, "login.html", "text/html");
+        });
 
 	// Style (generaly .css) route
 	CROW_ROUTE(app, "/styles/<string>")
@@ -95,6 +94,24 @@ int main()
 		([](const request& req, response& res, string filename) {
 			helperImages(res, filename); //Pass to helper then "parent"
 		});
+
+
+	//Login Features
+	  CROW_ROUTE(app, "/login").methods(HTTPMethod::Post)
+        ([](const request &req, response &res) {
+            string username = req.url_params.get("username");
+            string password = req.url_params.get("password");
+
+            // Check login credentials (you may want to replace this with your actual authentication logic)
+            if (username == "your_username" && password == "your_password") {
+                // Redirect to ReactionTest.html upon successful login
+                res.redirect("/ReactionTest.html?username=" + username);
+            } else {
+                // Add logic for handling incorrect login credentials
+                // For example, you might render an error message on the login.html page
+                sendFile(res, "login.html", "text/html");
+            }
+        });
 
 	// REQ5 Route
 	CROW_ROUTE(app, "/<int>/<string>").methods(HTTPMethod::Post)
@@ -118,7 +135,6 @@ int main()
 			}
 			res.end();
 		});
-
 	// REQ6 Route
 	CROW_ROUTE(app, "/Checkout").methods(HTTPMethod::Post)
 		([](const request& req, response& res) { // REQ6 a) handled in other route
@@ -171,6 +187,12 @@ int main()
 			}
 			res.end();
 		});
+
+	//Route for ReactionTest.html
+	CROW_ROUTE(app, "/ReactionTest.html").methods(HTTPMethod::Get)
+        ([](const request &req, response &res) {
+            sendFile(res, "ReactionTest.html", "text/html");
+        });
 
 	// Generic HTML route
 	CROW_ROUTE(app, "/<string>")
