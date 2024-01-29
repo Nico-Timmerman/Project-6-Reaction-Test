@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /SharedVolume
+CMAKE_SOURCE_DIR = /WebServerVolume
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /SharedVolume/build
+CMAKE_BINARY_DIR = /WebServerVolume/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /SharedVolume/build/CMakeFiles /SharedVolume/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /WebServerVolume/build/CMakeFiles /WebServerVolume/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /SharedVolume/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /WebServerVolume/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,24 +117,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Lab10
+# Target rules for targets named Project6
 
 # Build rule for target.
-Lab10: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Lab10
-.PHONY : Lab10
+Project6: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Project6
+.PHONY : Project6
 
 # fast build rule for target.
-Lab10/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab10.dir/build.make CMakeFiles/Lab10.dir/build
-.PHONY : Lab10/fast
+Project6/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/build
+.PHONY : Project6/fast
 
 main.o: main.cpp.o
 .PHONY : main.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab10.dir/build.make CMakeFiles/Lab10.dir/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -142,7 +142,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab10.dir/build.make CMakeFiles/Lab10.dir/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -150,7 +150,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab10.dir/build.make CMakeFiles/Lab10.dir/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -161,7 +161,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Lab10"
+	@echo "... Project6"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
