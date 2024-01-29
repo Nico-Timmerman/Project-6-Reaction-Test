@@ -1,2 +1,0 @@
-10, I-Block
-5, T-Block
