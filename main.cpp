@@ -1,6 +1,9 @@
 #define CROW_MAIN
 
 #include "crow_all.h"
+#include "DatabaseManipulation.h"
+#include <iostream>
+#include <fstream>
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 
@@ -167,13 +170,31 @@ void handleHighScore(const request& req, response& res) {
         res.write("{\"message\": \"High score updated successfully\", \"user\": " + to_string(user->UserID) + "}");
         res.end();
     }
-    // ... (existing code above)
+    // ...
 
     else {
         res.code = 404; // Not Found
         res.write("User not found");
         res.end();
     }
+}
+
+// Handler for styles.css file and simple hard routes
+void sendFile (response& res, string filename, string contentType) {
+	ifstream in("../public/" + filename, ifstream::in);
+	if (in) {
+		ostringstream contents;
+		contents << in.rdbuf();
+		in.close();
+		res.set_header("Content-Type", contentType);
+		res.write(contents.str());
+		res.code = 200;
+	}
+	else {
+		res.code = 404;
+		res.write("Not Found");
+	}
+	res.end();
 }
 
 int main() {
@@ -184,7 +205,78 @@ int main() {
     CROW_ROUTE(app, "/login").methods(HTTPMethod::Post, HTTPMethod::Put)(handleLogin);
     CROW_ROUTE(app, "/highscore").methods(HTTPMethod::Post, HTTPMethod::Put)(handleHighScore);
 
-    // ... (other routes)
+	CROW_ROUTE(app, "/")
+        ([](const request &req, response &res) {
+            sendFile(res, "login.html", "text/html");
+        });
+
+	//Login Features
+	  CROW_ROUTE(app, "/login").methods(HTTPMethod::Post)
+        ([](const request &req, response &res) {
+            string username = req.url_params.get("username");
+            string password = req.url_params.get("password");
+
+            // Check login credentials (you may want to replace this with your actual authentication logic)
+            if (username == "your_username" && password == "your_password") {
+                // Redirect to ReactionTest.html upon successful login
+                res.redirect("/ReactionTest.html?username=" + username);
+            } else {
+                // Add logic for handling incorrect login credentials
+                // For example, you might render an error message on the login.html page
+                sendFile(res, "login.html", "text/html");
+            }
+        });
+
+	//Route for ReactionTest.html
+	CROW_ROUTE(app, "/ReactionTest.html").methods(HTTPMethod::Get)
+        ([](const request &req, response &res) {
+            sendFile(res, "ReactionTest.html", "text/html");
+        });
+
+	CROW_ROUTE(app, "/styles/<string>")
+		([](const request& req, response& res, string filename) {
+			sendFile(res, "styles/" + filename, "text/css");
+		});
+
+    //PATCH method Route
+	//As I understand currently the idea is to update only part of the the user login resource(i.e. updating a users password but not username)
+	//Updated to above, the PATCH method will be used to update the users highscore
+	CROW_ROUTE(app, "/patchHighscore").methods(HTTPMethod::PATCH)
+		([](const request& req, response& res) {
+			auto HS = req.url_params.get("testTime");
+			auto uN = req.url_params.get("username");
+			initializeDatabase();
+			updateHighScore(HS, uN);
+		}); 
+		
+		
+	//DELETE method Route
+	//A good usage of the DELETE Method may be to "reset" a users high score, whether this be an admin-only tool, or available to all users is undetermined
+	CROW_ROUTE(app, "/deleteUser").methods(HTTPMethod::DELETE)
+		([](const request& req, response& res) {
+			string uN = req.url_params.get("uN");
+			initializeDatabase();
+			deleteUser(uN);
+		}); 
+		
+		
+	//OPTIONS method Route
+	//If my understanding is correct the technically this method should be allowed in addition to the others
+	//E.g. this method shows what other methods are available, without acting on the resource, so maybe use it in conjunction
+	CROW_ROUTE(app, "/options").methods(HTTPMethod::OPTIONS)
+		([](const request& req, response& res) {
+			//sendFile (response& res, string filename, string contentType) {
+			if(req.method == HTTPMethod::OPTIONS){
+				res.set_header("Content-Type", contentType);
+				res.write("Permitted: GET, POST, PUT, PATCH, DELETE, OPTIONS");
+				res.code = 200;
+			}
+			else {
+				res.code = 404;
+				res.write("Not Found");
+			}
+			res.end();
+		});
 
     // Serve HTML pages
     CROW_ROUTE(app, "/<string>").methods(HTTPMethod::Get)([](const request& req, response& res, string filename) {
@@ -207,6 +299,7 @@ int main() {
     // Start the server on port 23500
     app.port(23500).multithreaded().run();
 
+	finalizeDatabase();
     return 0;
 }
 
