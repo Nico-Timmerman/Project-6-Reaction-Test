@@ -277,6 +277,75 @@ int main() {
 			}
 			res.end();
 		});
+    // PUT route to update user information
+    CROW_ROUTE(app, "/updateUser")
+        .methods(HTTPMethod::PUT)
+        ([&](const request& req, response& res) {
+        try {
+            auto username = req.body["username"];
+            auto password = req.body["password"];
+            auto email = req.body["email"];
+
+            // Update the user's information in the database
+            updateUser(username, password, email);
+
+            // Send a JSON response with the updated user data
+            res.set_header("Content-Type", "application/json");
+            res.write("{\"message\": \"User information updated successfully\", \"user\": \"" + username + "\"}");
+            res.end();
+        }
+        catch (const std::exception& e) {
+            res.code = 400; // Bad Request
+            res.write(e.what());
+            res.end();
+        }
+            });
+
+    // POST route to create a new user
+    CROW_ROUTE(app, "/createUser")
+        .methods(HTTPMethod::POST)
+        ([&](const request& req, response& res) {
+        try {
+            auto username = req.body["username"];
+            auto password = req.body["password"];
+            auto email = req.body["email"];
+
+            // Create a new user in the database
+            addUser(username, email, password);
+
+            // Send a JSON response with the user data
+            res.set_header("Content-Type", "application/json");
+            res.write("{\"message\": \"User created successfully\", \"user\": \"" + username + "\"}");
+            res.end();
+        }
+        catch (const std::exception& e) {
+            res.code = 400; // Bad Request
+            res.write(e.what());
+            res.end();
+        }
+            });
+
+    // GET route to retrieve user information
+    CROW_ROUTE(app, "/getUser")
+        .methods(HTTPMethod::GET)
+        ([&](const request& req, response& res) {
+        try {
+            auto username = req.url_params.get("username");
+
+            // Retrieve user's information from the database
+            UserData user = getUser(username);
+
+            // Send a JSON response with the user's information
+            res.set_header("Content-Type", "application/json");
+            res.write("{\"message\": \"User information retrieved successfully\", \"user\": \"" + username + "\", \"email\": \"" + user.Email + "\", \"highscore\": " + std::to_string(user.HighScore) + "}");
+            res.end();
+        }
+        catch (const std::exception& e) {
+            res.code = 404; // Not Found
+            res.write(e.what());
+            res.end();
+        }
+            });
 
     // Serve HTML pages
     CROW_ROUTE(app, "/<string>").methods(HTTPMethod::Get)([](const request& req, response& res, string filename) {
