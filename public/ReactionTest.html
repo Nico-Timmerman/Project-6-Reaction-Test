@@ -1,0 +1,84 @@
+<style>
+    .centeredButtons {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+    }
+
+    .buttons {
+        width: 300px;
+        height: 300px;
+        font-size: large;
+    }
+
+    #b2 {
+        background-color: aqua;
+    }
+</style>
+
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username');
+
+    document.getElementById('username').textContent = username;
+
+    let startTime;
+    function startTimer() {
+        startTime = new Date().getTime();
+    }
+    function stopTimer() {
+        const endTime = new Date().getTime();
+        var time = endTime - startTime;
+
+        var secondButton = document.getElementById('b2');
+        secondButton.innerText = time.toLocaleString();
+        secondButton.style.backgroundColor = 'forestgreen'
+
+        document.getElementById('Submit').style.display = 'block';
+    }
+
+    function unhideButton() {
+        document.getElementById('b').innerText = "Get Ready!";
+
+        setTimeout(startGame, getNumberBetweenThreeAndSeven());
+
+    }
+    function startGame() {
+        document.getElementById('b').style.display = 'none';
+        document.getElementById('b2').style.display = 'block';
+        startTimer();
+    }
+
+    function getNumberBetweenThreeAndSeven() {
+        return (Math.random() * (7 - 3) + 1) * 1000;
+    }
+    function randomColors() {
+        return '#' + Math.floor(Math.random() * 16777215).toString(16);
+    }
+    function submitScore() {        
+        //what ever needs to be done to give score to Crow
+        var currentURL = window.location.href;
+        var reactionTimeParam = document.getElementById('b2').innerText;
+        //not 100% sure how to get username yet.
+        var userNameParam =  document.getElementById('username');
+        var newURL = currentURL + "?testTime=" + reactionTimeParam + "&username=" + userNameParam;
+
+        window.location.href = newURL;      
+    }
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div class="centeredButtons">
+            <p1 id="username"></p1>
+            <button id="b" class="buttons button1" onclick="unhideButton()">Click When Ready</button>
+            <button id="b2" class="buttons button2" style="display:none" onclick="stopTimer()">Click!</button>
+            <button id="Submit" style="display: none" onclick="submitScore()">Submit Score</button>
+        </div>
+    </body>
+</html>
