@@ -5,6 +5,7 @@
 #include <cstdint>
 
 //#include <Windows.h> - Ive taken some definitions from this header
+/*
 typedef wchar_t* LPWSTR;
 typedef uint32_t DWORD;
 typedef void VOID;
@@ -21,9 +22,9 @@ struct GUID {
     uint8_t  Data4[8];
 };
 
-typedef wchar_t WCHAR;
+typedef wchar_t WCHAR; //This line and some others were giving errors
 typedef char CHAR;
-
+*/
 
 
 #include <sql.h>

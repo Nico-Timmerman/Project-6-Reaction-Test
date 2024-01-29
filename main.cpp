@@ -292,9 +292,9 @@ int main() {
         .methods(HTTPMethod::PUT)
         ([&](const request& req, response& res) {
         try {
-            string username = req.body[const_username];
-            string password = req.body[const_password];
-            string email = req.body[const_email];
+            string username = req.body/*[const_username]*/;
+            string password = req.body/*[const_password]*/;
+            string email = req.body/*[const_email]*/;
 
             // Update the user's information in the database
             addUser(username, password, email); //was originally updateUser but that does not exist yet
@@ -316,9 +316,9 @@ int main() {
         .methods(HTTPMethod::POST)
         ([&](const request& req, response& res) {
         try {
-            string username = req.body[const_username];
-            string password = req.body[const_password];
-            string email = req.body[const_email];
+            string username = req.body/*[const_username]*/;
+            string password = req.body/*[const_password]*/;
+            string email = req.body/*[const_email]*/;
 
             // Create a new user in the database
             addUser(username, email, password);
