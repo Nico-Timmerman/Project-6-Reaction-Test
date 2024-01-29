@@ -2,7 +2,30 @@
 #define DATABASE_MANIPULATION_H
 
 #include <iostream>
-#include <Windows.h>
+#include <cstdint>
+
+//#include <Windows.h> - Ive taken some definitions from this header
+typedef wchar_t* LPWSTR;
+typedef uint32_t DWORD;
+typedef void VOID;
+typedef bool BOOL;
+typedef int64_t INT64;
+typedef uint64_t UINT64;
+typedef uint16_t WORD;
+typedef uint8_t BYTE;
+
+struct GUID {
+    uint32_t Data1;
+    uint16_t Data2;
+    uint16_t Data3;
+    uint8_t  Data4[8];
+};
+
+typedef wchar_t WCHAR;
+typedef char CHAR;
+
+
+
 #include <sql.h>
 #include <sqlext.h>
 #include <stdexcept>

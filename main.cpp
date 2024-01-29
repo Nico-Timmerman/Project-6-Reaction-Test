@@ -4,24 +4,32 @@
 #include "DatabaseManipulation.h"
 #include <iostream>
 #include <fstream>
-#include <cpprest/http_client.h>
-#include <cpprest/filestream.h>
+#include <string>
+//#include <cpprest/http_client.h>
+//#include <cpprest/filestream.h>
 
 using namespace std;
 using namespace crow;
+
+
+struct UserData {
+    int UserID;
+    string Username;
+    string Password;
+    string Email;
+    int HighScore;
+}user;
+
+string const_username = "username";
+string const_password = "password";
+string const_email = "email";
+
+/*
 using namespace web;
 using namespace web::http;
 using namespace web::http::client;
 
 const utility::string_t connection_string = U("<connection_string>");
-
-struct UserData {
-    int UserID;
-    utility::string_t Username;
-    utility::string_t Password;
-    utility::string_t Email;
-    int HighScore;
-};
 
 // In-memory storage for user data (this should be replaced with a database)
 std::vector<UserData> users;
@@ -178,6 +186,7 @@ void handleHighScore(const request& req, response& res) {
         res.end();
     }
 }
+*/
 
 // Handler for styles.css file and simple hard routes
 void sendFile (response& res, string filename, string contentType) {
@@ -201,9 +210,9 @@ int main() {
     SimpleApp app;
 
     // Register routes
-    CROW_ROUTE(app, "/register").methods(HTTPMethod::Post, HTTPMethod::Put)(handleRegistration);
-    CROW_ROUTE(app, "/login").methods(HTTPMethod::Post, HTTPMethod::Put)(handleLogin);
-    CROW_ROUTE(app, "/highscore").methods(HTTPMethod::Post, HTTPMethod::Put)(handleHighScore);
+    //CROW_ROUTE(app, "/register").methods(HTTPMethod::Post, HTTPMethod::Put)(handleRegistration);
+    //CROW_ROUTE(app, "/login").methods(HTTPMethod::Post, HTTPMethod::Put)(handleLogin);
+    //CROW_ROUTE(app, "/highscore").methods(HTTPMethod::Post, HTTPMethod::Put)(handleHighScore);
 
 	CROW_ROUTE(app, "/")
         ([](const request &req, response &res) {
@@ -243,10 +252,11 @@ int main() {
 	//Updated to above, the PATCH method will be used to update the users highscore
 	CROW_ROUTE(app, "/patchHighscore").methods(HTTPMethod::PATCH)
 		([](const request& req, response& res) {
-			auto HS = req.url_params.get("testTime");
-			auto uN = req.url_params.get("username");
+			string HS = req.url_params.get("testTime");
+			int tmp_HS = stoi(HS);
+			string uN = req.url_params.get("username");
 			initializeDatabase();
-			updateHighScore(HS, uN);
+			updateHighScore(uN, tmp_HS);
 		}); 
 		
 		
@@ -267,7 +277,7 @@ int main() {
 		([](const request& req, response& res) {
 			//sendFile (response& res, string filename, string contentType) {
 			if(req.method == HTTPMethod::OPTIONS){
-				res.set_header("Content-Type", contentType);
+				res.set_header("Content-Type", "application/json");
 				res.write("Permitted: GET, POST, PUT, PATCH, DELETE, OPTIONS");
 				res.code = 200;
 			}
@@ -282,12 +292,12 @@ int main() {
         .methods(HTTPMethod::PUT)
         ([&](const request& req, response& res) {
         try {
-            auto username = req.body["username"];
-            auto password = req.body["password"];
-            auto email = req.body["email"];
+            string username = req.body[const_username];
+            string password = req.body[const_password];
+            string email = req.body[const_email];
 
             // Update the user's information in the database
-            updateUser(username, password, email);
+            addUser(username, password, email); //was originally updateUser but that does not exist yet
 
             // Send a JSON response with the updated user data
             res.set_header("Content-Type", "application/json");
@@ -306,9 +316,9 @@ int main() {
         .methods(HTTPMethod::POST)
         ([&](const request& req, response& res) {
         try {
-            auto username = req.body["username"];
-            auto password = req.body["password"];
-            auto email = req.body["email"];
+            string username = req.body[const_username];
+            string password = req.body[const_password];
+            string email = req.body[const_email];
 
             // Create a new user in the database
             addUser(username, email, password);
@@ -330,10 +340,13 @@ int main() {
         .methods(HTTPMethod::GET)
         ([&](const request& req, response& res) {
         try {
-            auto username = req.url_params.get("username");
+            string username = req.url_params.get("username");
 
             // Retrieve user's information from the database
-            UserData user = getUser(username);
+			//was originally getUser but we don't have that created yet
+			//was also originally trying to populate the struct with the data but that functionality does not exist yet
+            /*UserData user = */getHighScore(username); 
+			
 
             // Send a JSON response with the user's information
             res.set_header("Content-Type", "application/json");

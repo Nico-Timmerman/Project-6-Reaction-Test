@@ -1630,4 +1630,6 @@ CMakeFiles/Project6.dir/main.cpp.o: /WebServerVolume/main.cpp \
  /usr/include/boost/date_time/posix_time/conversion.hpp \
  /usr/include/boost/date_time/filetime_functions.hpp \
  /usr/include/boost/date_time/posix_time/time_parsers.hpp \
- /usr/include/c++/11/thread
+ /usr/include/c++/11/thread /WebServerVolume/DatabaseManipulation.h \
+ /usr/include/sql.h /usr/include/sqltypes.h /usr/include/sqlext.h \
+ /usr/include/sqlucode.h /usr/include/c++/11/codecvt
