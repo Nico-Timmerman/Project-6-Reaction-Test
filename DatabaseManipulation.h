@@ -4,27 +4,58 @@
 #include <iostream>
 #include <cstdint>
 
-//#include <Windows.h> - Ive taken some definitions from this header
-/*
+//#include <Windows.h> - Ive taken some definitions from this header in the form of
+// Conditional typedefs to avoid redefinition errors
+#ifndef LPWSTR
 typedef wchar_t* LPWSTR;
-typedef uint32_t DWORD;
-typedef void VOID;
-typedef bool BOOL;
-typedef int64_t INT64;
-typedef uint64_t UINT64;
-typedef uint16_t WORD;
-typedef uint8_t BYTE;
+#endif
 
+#ifndef DWORD
+typedef uint32_t DWORD;
+#endif
+
+#ifndef VOID
+typedef void VOID;
+#endif
+
+#ifndef BOOL
+typedef bool BOOL;
+#endif
+
+#ifndef INT64
+typedef int64_t INT64;
+#endif
+
+#ifndef UINT64
+typedef uint64_t UINT64;
+#endif
+
+#ifndef WORD
+typedef uint16_t WORD;
+#endif
+
+#ifndef BYTE
+typedef uint8_t BYTE;
+#endif
+
+// GUID structure
+#ifndef GUID_DEFINED
+#define GUID_DEFINED
 struct GUID {
     uint32_t Data1;
     uint16_t Data2;
     uint16_t Data3;
     uint8_t  Data4[8];
 };
+#endif
 
-typedef wchar_t WCHAR; //This line and some others were giving errors
+#ifndef WCHAR
+typedef wchar_t WCHAR;
+#endif
+
+#ifndef CHAR
 typedef char CHAR;
-*/
+#endif
 
 
 #include <sql.h>
