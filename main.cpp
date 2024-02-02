@@ -257,6 +257,16 @@ int main() {
 			string uN = req.url_params.get("username");
 			initializeDatabase();
 			updateHighScore(uN, tmp_HS);
+			if(req.method == HTTPMethod::PATCH){
+				res.set_header("Content-Type", "application/json");
+				res.write("Highscore updated!");
+				res.code = 200;
+			}
+			else {
+				res.code = 404;
+				res.write("Not Found");
+			}
+			res.end();
 		}); 
 		
 		
@@ -267,6 +277,16 @@ int main() {
 			string uN = req.url_params.get("uN");
 			initializeDatabase();
 			deleteUser(uN);
+			if(req.method == HTTPMethod::DELETE){
+				res.set_header("Content-Type", "application/json");
+				res.write("User Deleted!");
+				res.code = 200;
+			}
+			else {
+				res.code = 404;
+				res.write("Not Found");
+			}
+			res.end();
 		}); 
 		
 		
