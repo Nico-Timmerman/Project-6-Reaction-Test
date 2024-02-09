@@ -228,7 +228,10 @@ int main() {
             // Check login credentials (you may want to replace this with your actual authentication logic)
             if (username == "your_username" && password == "your_password") {
                 // Redirect to ReactionTest.html upon successful login
-                res.redirect("/ReactionTest.html?username=" + username);
+                
+                sendFile(res, "ReactionTest.html", "text/html");
+                
+                //res.redirect("/ReactionTest.html?username=" + username);
             } else {
                 // Add logic for handling incorrect login credentials
                 // For example, you might render an error message on the login.html page
