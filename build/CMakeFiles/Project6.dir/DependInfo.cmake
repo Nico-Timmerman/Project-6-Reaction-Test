@@ -8,7 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/WebServerVolume/main.cpp" "CMakeFiles/Project6.dir/main.cpp.o" "gcc" "CMakeFiles/Project6.dir/main.cpp.o.d"
+  "/volume/DatabaseManipulation.cpp" "CMakeFiles/Project6.dir/DatabaseManipulation.cpp.o" "gcc" "CMakeFiles/Project6.dir/DatabaseManipulation.cpp.o.d"
+  "/volume/main.cpp" "CMakeFiles/Project6.dir/main.cpp.o" "gcc" "CMakeFiles/Project6.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links.

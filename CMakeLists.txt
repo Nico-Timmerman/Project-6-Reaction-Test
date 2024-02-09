@@ -9,5 +9,5 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(Threads)
 
 include_directories(${Boost_INCLUDE_DIRS})
-add_executable(Project6 main.cpp)
+add_executable(Project6 main.cpp DatabaseManipulation.cpp)
 target_link_libraries(Project6 ${Boost_LIBRARIES} Threads::Threads)

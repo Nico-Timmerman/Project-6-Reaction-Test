@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Project6.dir/DatabaseManipulation.cpp.o"
+  "CMakeFiles/Project6.dir/DatabaseManipulation.cpp.o.d"
   "CMakeFiles/Project6.dir/main.cpp.o"
   "CMakeFiles/Project6.dir/main.cpp.o.d"
   "Project6"

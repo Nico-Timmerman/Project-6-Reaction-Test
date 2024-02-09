@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /WebServerVolume
+CMAKE_SOURCE_DIR = /volume
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /WebServerVolume/build
+CMAKE_BINARY_DIR = /volume/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /WebServerVolume/build/CMakeFiles /WebServerVolume/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /volume/build/CMakeFiles /volume/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /WebServerVolume/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /volume/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,6 +129,30 @@ Project6/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/build
 .PHONY : Project6/fast
 
+DatabaseManipulation.o: DatabaseManipulation.cpp.o
+.PHONY : DatabaseManipulation.o
+
+# target to build an object file
+DatabaseManipulation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/DatabaseManipulation.cpp.o
+.PHONY : DatabaseManipulation.cpp.o
+
+DatabaseManipulation.i: DatabaseManipulation.cpp.i
+.PHONY : DatabaseManipulation.i
+
+# target to preprocess a source file
+DatabaseManipulation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/DatabaseManipulation.cpp.i
+.PHONY : DatabaseManipulation.cpp.i
+
+DatabaseManipulation.s: DatabaseManipulation.cpp.s
+.PHONY : DatabaseManipulation.s
+
+# target to generate assembly for a file
+DatabaseManipulation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Project6.dir/build.make CMakeFiles/Project6.dir/DatabaseManipulation.cpp.s
+.PHONY : DatabaseManipulation.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Project6"
+	@echo "... DatabaseManipulation.o"
+	@echo "... DatabaseManipulation.i"
+	@echo "... DatabaseManipulation.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

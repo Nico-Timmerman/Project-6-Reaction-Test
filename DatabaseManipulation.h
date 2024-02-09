@@ -6,10 +6,6 @@
 
 //#include <Windows.h> - Ive taken some definitions from this header in the form of
 // Conditional typedefs to avoid redefinition errors
-#ifndef LPWSTR
-typedef wchar_t* LPWSTR;
-#endif
-
 #ifndef DWORD
 typedef uint32_t DWORD;
 #endif
@@ -50,7 +46,11 @@ struct GUID {
 #endif
 
 #ifndef WCHAR
-typedef wchar_t WCHAR;
+typedef short unsigned int WCHAR;
+#endif
+
+#ifndef LPWSTR
+typedef WCHAR* LPWSTR;
 #endif
 
 #ifndef CHAR
