@@ -20,6 +20,19 @@
 </style>
 
 
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div class="centeredButtons">
+            <p1 id="username"></p1>
+            <button id="b" class="buttons button1" onclick="unhideButton()">Click When Ready</button>
+            <button id="b2" class="buttons button2" style="display:none" onclick="stopTimer()">Click!</button>
+            <button id="Submit" style="display: none" onclick="submitScore()">Submit Score</button>
+        </div>
+    </body>
+</html>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
@@ -29,16 +42,22 @@
     let startTime;
     function startTimer() {
         startTime = new Date().getTime();
+        //alert("timer started");
     }
     function stopTimer() {
-        const endTime = new Date().getTime();
-        var time = endTime - startTime;
 
+        const endTime = new Date().getTime();
+        //alert("Alert 1");
+        var time = endTime - startTime;
+        //alert("Alert 2");
+       
         var secondButton = document.getElementById('b2');
+        
         secondButton.innerText = time.toLocaleString();
         secondButton.style.backgroundColor = 'forestgreen';
 
         document.getElementById('Submit').style.display = 'block';
+        
     }
 
     function unhideButton() {
@@ -70,15 +89,3 @@
         window.location.href = newURL;      
     }
 </script>
-
-<!DOCTYPE html>
-<html lang="en">
-    <body>
-        <div class="centeredButtons">
-            <p1 id="username"></p1>
-            <button id="b" class="buttons button1" onclick="unhideButton()">Click When Ready</button>
-            <button id="b2" class="buttons button2" style="display:none" onclick="stopTimer()">Click!</button>
-            <button id="Submit" style="display: none" onclick="submitScore()">Submit Score</button>
-        </div>
-    </body>
-</html>
