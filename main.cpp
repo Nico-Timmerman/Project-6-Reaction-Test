@@ -24,169 +24,6 @@ string const_username = "username";
 string const_password = "password";
 string const_email = "email";
 
-/*
-using namespace web;
-using namespace web::http;
-using namespace web::http::client;
-
-const utility::string_t connection_string = U("<connection_string>");
-
-// In-memory storage for user data (this should be replaced with a database)
-std::vector<UserData> users;
-
-// Function to insert user data into the Azure SQL Database
-void insertUserData(const UserData& user) {
-    try {
-        // Create a connection to the Azure SQL Database
-        sql::SqlConnection conn(connection_string);
-
-        // Open the connection
-        conn.Open();
-
-        // Define the SQL query to insert user data
-        const wstring query = L"INSERT INTO Users (UserID, Username, Password, Email, HighScore) "
-            L"VALUES (?, ?, ?, ?, ?)";
-
-        // Create a command object
-        sql::SqlCommand cmd(conn, query);
-
-        // Set parameter values
-        cmd.Parameters().AddInt32(L"UserID", user.UserID);
-        cmd.Parameters().AddString(L"Username", user.Username);
-        cmd.Parameters().AddString(L"Password", user.Password);
-        cmd.Parameters().AddString(L"Email", user.Email);
-        cmd.Parameters().AddInt32(L"HighScore", user.HighScore);
-
-        // Execute the SQL command
-        cmd.ExecuteNonQuery();
-    }
-    catch (const sql::SqlException& e) {
-        cerr << "SQL Exception: " << e.what() << endl;
-    }
-}
-
-// Function to find a user by username in the in-memory storage
-UserData* findUserByUsername(const utility::string_t& username) {
-    auto it = find_if(users.begin(), users.end(), [username](const UserData& user) {
-        return user.Username == username;
-        });
-
-    return (it != users.end()) ? &(*it) : nullptr;
-}
-
-// Function to handle user registration (now allows for PUT requests)
-void handleRegistration(const request& req, response& res) {
-    utility::string_t username = req.body["username"];
-    utility::string_t password = req.body["password"];
-    utility::string_t email = req.body["email"];
-
-    // Check if the username is already taken in the in-memory storage
-    UserData* existingUser = findUserByUsername(username);
-
-    if (existingUser != nullptr && req.method == HTTPMethod::Put) {
-        // Update existing user data
-        existingUser->Password = password;
-        existingUser->Email = email;
-
-        // Insert the updated user data into the Azure SQL Database
-        insertUserData(*existingUser);
-
-        // Send a JSON response with the updated user data
-        res.set_header("Content-Type", "application/json");
-        res.write("{\"message\": \"User information updated successfully\", \"user\": " + to_string(existingUser->UserID) + "}");
-        res.end();
-    }
-    else if (existingUser == nullptr) {
-        // Create a new user
-        UserData newUser;
-        newUser.UserID = users.size() + 1;
-        newUser.Username = username;
-        newUser.Password = password; // In a real application, hash and salt the password
-        newUser.Email = email;
-        newUser.HighScore = 0;
-
-        // Add the new user to the in-memory storage
-        users.push_back(newUser);
-
-        // Insert the new user data into the Azure SQL Database
-        insertUserData(newUser);
-
-        // Send a JSON response with the user data
-        res.set_header("Content-Type", "application/json");
-        res.write("{\"message\": \"User registered successfully\", \"user\": " + to_string(newUser.UserID) + "}");
-        res.end();
-    }
-    else {
-        res.code = 400; // Bad Request
-        res.write("Username already exists");
-        res.end();
-    }
-}
-
-// Function to handle user login (now allows for PUT requests)
-void handleLogin(const request& req, response& res) {
-    utility::string_t username = req.body["username"];
-    utility::string_t password = req.body["password"];
-
-    // Find the user by username in the in-memory storage
-    UserData* user = findUserByUsername(username);
-
-    // Check if the user exists and the password is correct
-    if (user != nullptr && user->Password == password) {
-        // Send a JSON response with the user data
-        res.set_header("Content-Type", "application/json");
-        res.write("{\"message\": \"Login successful\", \"user\": " + to_string(user->UserID) + "}");
-        res.end();
-    }
-    else if (user != nullptr && req.method == HTTPMethod::Put) {
-        // Update the user's password
-        user->Password = password;
-
-        // Insert the updated user data into the Azure SQL Database
-        insertUserData(*user);
-
-        // Send a JSON response with the updated user data
-        res.set_header("Content-Type", "application/json");
-        res.write("{\"message\": \"Password updated successfully\", \"user\": " + to_string(user->UserID) + "}");
-        res.end();
-    }
-    else {
-        res.code = 401; // Unauthorized
-        res.write("Invalid username or password");
-        res.end();
-    }
-}
-
-// Function to handle high score updates (now allows for PUT requests)
-void handleHighScore(const request& req, response& res) {
-    utility::string_t username = req.body["username"];
-    int newHighScore = std::stoi(req.body["highscore"]);
-
-    // Find the user by username in the in-memory storage
-    UserData* user = findUserByUsername(username);
-
-    // Check if the user exists
-    if (user != nullptr) {
-        // Update the user's high score
-        user->HighScore = newHighScore;
-
-        // Insert the updated user data into the Azure SQL Database
-        insertUserData(*user);
-
-        // Send a JSON response with the updated user data
-        res.set_header("Content-Type", "application/json");
-        res.write("{\"message\": \"High score updated successfully\", \"user\": " + to_string(user->UserID) + "}");
-        res.end();
-    }
-    // ...
-
-    else {
-        res.code = 404; // Not Found
-        res.write("User not found");
-        res.end();
-    }
-}
-*/
 
 // Handler for styles.css file and simple hard routes
 void sendFile (response& res, string filename, string contentType) {
@@ -206,197 +43,167 @@ void sendFile (response& res, string filename, string contentType) {
 	res.end();
 }
 
+// Helper functions that will serve the various static content of the website
+void sendHTML(response& res, string filename) { sendFile(res, filename + ".html", "text/html"); }
+void sendImage(response& res, string filename) { sendFile(res, "images/" + filename, "image/jpeg"); }
+void sendScript(response& res, string filename) { sendFile(res, "scripts/" + filename, "text/javascript"); }
+void sendStyle(response& res, string filename) { sendFile(res, "styles/" + filename, "text/css"); }
+
+
 int main() {
     SimpleApp app;
 
-    // Register routes
-    //CROW_ROUTE(app, "/register").methods(HTTPMethod::Post, HTTPMethod::Put)(handleRegistration);
-    //CROW_ROUTE(app, "/login").methods(HTTPMethod::Post, HTTPMethod::Put)(handleLogin);
-    //CROW_ROUTE(app, "/highscore").methods(HTTPMethod::Post, HTTPMethod::Put)(handleHighScore);
-
+	//ROOT ROUTE - Default login.html page
 	CROW_ROUTE(app, "/")
-        ([](const request &req, response &res) {
-            sendFile(res, "login.html", "text/html");
-        });
+		([](const request& req, response& res) { sendHTML(res, "login"); });
 
-	//Login Features
-	  CROW_ROUTE(app, "/login").methods(HTTPMethod::Post)
-        ([](const request &req, response &res) {
-            string username = req.url_params.get("username");
-            string password = req.url_params.get("password");
+	// defines a generic route for an HTML pages
+	CROW_ROUTE(app, "/<string>")
+		([](const request& req, response& res, string filename)
+			{
+				sendHTML(res, filename);
+			});
 
-            // Check login credentials (you may want to replace this with your actual authentication logic)
-            if (username == "your_username" && password == "your_password") {
-                // Redirect to ReactionTest.html upon successful login
-                res.redirect("/ReactionTest.html?username=" + username);
-            } else {
-                // Add logic for handling incorrect login credentials
-                // For example, you might render an error message on the login.html page
-                sendFile(res, "login.html", "text/html");
-            }
-        });
+	/**** The following routes support the database-UserCreation capabilities for the web server***/
+	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::POST)
+		([](const request& req, response& res, string EventType) 
+			{
+				string username = "";
+				string password = "";
+				string email = "";
+				
+				string Method = method_name(req.method);
+				if (Method == "POST") {
+					// The POST path here should be used to check the database for the user and handle the login.
+					string username = req.url_params.get("username");
+					string password = req.url_params.get("password");
+				}
+				
+				string msg = "";		//Generic response message to be generated based on request
+				bool result = false;	//Result of writing event to the log file
 
-	//Route for ReactionTest.html
-	CROW_ROUTE(app, "/ReactionTest.html").methods(HTTPMethod::Get)
-        ([](const request &req, response &res) {
-            sendFile(res, "ReactionTest.html", "text/html");
-        });
+				if (EventType == "Login"){
+					// Once the Database has users in it that we can check against the following line should be switched
+					// Such that it checks if the user exists in the Database. For now it checks if user=admin & pass=admin.
+					if (username == "admin" && password == "admin"){
+						sendFile(res, "ReactionTest.html?username=admin&password=admin", "text/html");
+						result = true;
+					}
+				} else {
+					res.code = 400;
+					msg = "Bad Request.  No Event Type " + EventType;
+					res.write(msg.c_str());
+				}
 
-	CROW_ROUTE(app, "/styles/<string>")
-		([](const request& req, response& res, string filename) {
-			sendFile(res, "styles/" + filename, "text/css");
-		});
+				if (result) {
+					res.code = 202;
+					msg = "<div>Event Added Successfully <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					res.write(msg.c_str());
+				} else {
+					res.code = 500;
+					msg = "INTERNAL SERVER ERROR";
+					res.write(msg.c_str());
+				}
 
-    //PATCH method Route
-	//As I understand currently the idea is to update only part of the the user login resource(i.e. updating a users password but not username)
-	//Updated to above, the PATCH method will be used to update the users highscore
-	CROW_ROUTE(app, "/patchHighscore").methods(HTTPMethod::PATCH)
-		([](const request& req, response& res) {
-			string HS = req.url_params.get("testTime");
-			int tmp_HS = stoi(HS);
-			string uN = req.url_params.get("username");
-			initializeDatabase();
-			updateHighScore(uN, tmp_HS);
-			if(req.method == HTTPMethod::PATCH){
-				res.set_header("Content-Type", "application/json");
-				res.write("Highscore updated!");
-				res.code = 200;
-			}
-			else {
-				res.code = 404;
-				res.write("Not Found");
-			}
-			res.end();
-		}); 
-		
-		
-	//DELETE method Route
-	//A good usage of the DELETE Method may be to "reset" a users high score, whether this be an admin-only tool, or available to all users is undetermined
-	CROW_ROUTE(app, "/deleteUser").methods(HTTPMethod::DELETE)
-		([](const request& req, response& res) {
-			string uN = req.url_params.get("uN");
-			initializeDatabase();
-			deleteUser(uN);
-			if(req.method == HTTPMethod::DELETE){
-				res.set_header("Content-Type", "application/json");
-				res.write("User Deleted!");
-				res.code = 200;
-			}
-			else {
-				res.code = 404;
-				res.write("Not Found");
-			}
-			res.end();
-		}); 
-		
-		
-	//OPTIONS method Route
-	//If my understanding is correct the technically this method should be allowed in addition to the others
-	//E.g. this method shows what other methods are available, without acting on the resource, so maybe use it in conjunction
-	CROW_ROUTE(app, "/options").methods(HTTPMethod::OPTIONS)
-		([](const request& req, response& res) {
-			//sendFile (response& res, string filename, string contentType) {
-			if(req.method == HTTPMethod::OPTIONS){
-				res.set_header("Content-Type", "application/json");
-				res.write("Permitted: GET, POST, PUT, PATCH, DELETE, OPTIONS");
-				res.code = 200;
-			}
-			else {
-				res.code = 404;
-				res.write("Not Found");
-			}
-			res.end();
-		});
-    // PUT route to update user information
-    CROW_ROUTE(app, "/updateUser")
-        .methods(HTTPMethod::PUT)
-        ([&](const request& req, response& res) {
-        try {
-            string username = req.body/*[const_username]*/;
-            string password = req.body/*[const_password]*/;
-            string email = req.body/*[const_email]*/;
+				res.end();
+			});
 
-            // Update the user's information in the database
-            addUser(username, password, email); //was originally updateUser but that does not exist yet
+	/* The methods in this route are methods that cannot be called within HTML due to general lacking-
+	 * browser support. OPTIONS is handled by Crow by default, as noted below this route in comments.
+	 * 
+	 * NEED TO FIND A WAY TO CALL THESE ROUTES (can be called easily in JMeter as far as I know).
+	*/
+	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::DELETE, HTTPMethod::PATCH, HTTPMethod::PUT)
+		([](const request& req, response& res, string EventType)
+			{
+				string username = "";
+				string password = "";
+				string email = "";
+				string highscore = "";
 
-            // Send a JSON response with the updated user data
-            res.set_header("Content-Type", "application/json");
-            res.write("{\"message\": \"User information updated successfully\", \"user\": \"" + username + "\"}");
-            res.end();
-        }
-        catch (const std::exception& e) {
-            res.code = 400; // Bad Request
-            res.write(e.what());
-            res.end();
-        }
-            });
+				string Method = method_name(req.method);
+				if (Method == "DELETE") {
+					// The DELETE method here should be used to remove a user from the Database
+					username = req.url_params.get("username");
+				} else if (Method == "PUT") {
+					// The PUT path here should be used to add a new user to the database.
+					username = req.url_params.get("username");
+					password = req.url_params.get("password");
+					email = req.url_params.get("email");
+				} else {
+					// The PATCH/Update path here should be used to update the user's score in the Database
+					username = req.url_params.get("username");
+					highscore = req.url_params.get("highscore");
+				}
 
-    // POST route to create a new user
-    CROW_ROUTE(app, "/createUser")
-        .methods(HTTPMethod::POST)
-        ([&](const request& req, response& res) {
-        try {
-            string username = req.body/*[const_username]*/;
-            string password = req.body/*[const_password]*/;
-            string email = req.body/*[const_email]*/;
+				string msg = "";		//Generic response message to be generated based on request
+				bool result = false;	//Result of writing event to the log file
 
-            // Create a new user in the database
-            addUser(username, email, password);
+				if (EventType == "PruneUser") {
+					deleteUser(username);
+					result = true;
+				} else if (EventType == "UpdateScore") {
+					updateHighScore(username, stoi(highscore));
+					result = true;
+				} else if (EventType == "CreateUser") {
+					addUser(username, email, password);
+					result = true;
+				} else {
+					res.code = 400;
+					msg = "Bad Request.  No Event Type, receieved: " + EventType;
+					res.write(msg.c_str());
+				}
 
-            // Send a JSON response with the user data
-            res.set_header("Content-Type", "application/json");
-            res.write("{\"message\": \"User created successfully\", \"user\": \"" + username + "\"}");
-            res.end();
-        }
-        catch (const std::exception& e) {
-            res.code = 400; // Bad Request
-            res.write(e.what());
-            res.end();
-        }
-            });
+				if (result) {
+					res.code = 202;
+					msg = "<div>Event Successfully Updated <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					res.write(msg.c_str());
+				} else {
+					res.code = 500;
+					msg = "INTERNAL SERVER ERROR";
+					res.write(msg.c_str());
+				}
 
-    // GET route to retrieve user information
-    CROW_ROUTE(app, "/getUser")
-        .methods(HTTPMethod::GET)
-        ([&](const request& req, response& res) {
-        try {
-            string username = req.url_params.get("username");
+				res.end();
+			});
 
-            // Retrieve user's information from the database
-			//was originally getUser but we don't have that created yet
-			//was also originally trying to populate the struct with the data but that functionality does not exist yet
-            /*UserData user = */getHighScore(username); 
-			
+	/*
+	// Ignore this code!
+	// Crow handles Options automatically!
+	// https://crowcpp.org/master/guides/routes/
+	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::OPTIONS)
+		([](const request& req, response& res, string EventType)
+			{
+				if (EventType == "Options")
+					result = true;
+				else
+				{
+					res.code = 400;
+					msg = "Bad Request.  No Event Type, receieved: " + EventType;
+					res.write(msg.c_str());
+				}
+				
+				if (result)
+				{
+					res.code = 202;
+					msg = "<div>Event Successfully Updated <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					res.write(msg.c_str());
+				}
+				else
+				{
+					res.code = 500;
+					msg = "INTERNAL SERVER ERROR";
+					res.write(msg.c_str());
+				}
 
-            // Send a JSON response with the user's information
-            res.set_header("Content-Type", "application/json");
-            res.write("{\"message\": \"User information retrieved successfully\", \"user\": \"" + username + "\", \"email\": \"" + user.Email + "\", \"highscore\": " + std::to_string(user.HighScore) + "}");
-            res.end();
-        }
-        catch (const std::exception& e) {
-            res.code = 404; // Not Found
-            res.write(e.what());
-            res.end();
-        }
-            });
+				res.end();
+			});
+	*?
 
-    // Serve HTML pages
-    CROW_ROUTE(app, "/<string>").methods(HTTPMethod::Get)([](const request& req, response& res, string filename) {
-        ifstream in("../public/" + filename, ifstream::in);
-        if (in) {
-            ostringstream contents;
-            contents << in.rdbuf();
-            in.close();
-            res.set_header("Content-Type", "text/html");
-            res.write(contents.str());
-            res.code = 200;
-        }
-        else {
-            res.code = 404;
-            res.write("Not Found");
-        }
-        res.end();
-        });
+    /********* Standard routes to support styles and images *********/
+	CROW_ROUTE(app, "/styles/<string>")([](const request& req, response& res, string filename) { sendStyle(res, filename); });
+	CROW_ROUTE(app, "/images/<string>")([](const request& req, response& res, string filename) { sendImage(res, filename); });
+
 
     // Start the server on port 23500
     app.port(23500).multithreaded().run();

@@ -219,6 +219,15 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Path to unixODBC or iODBC config program
+ODBC_CONFIG:FILEPATH=ODBC_CONFIG-NOTFOUND
+
+//Path to a file.
+ODBC_INCLUDE_DIR:PATH=/usr/include
+
+//Path to a library.
+ODBC_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libodbc.so
+
 //Value Computed by CMake
 Project6_BINARY_DIR:STATIC=/volume/build
 
@@ -393,8 +402,16 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Boost
 FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake][cfound components: system filesystem ][v1.74.0()]
+//Details about finding ODBC
+FIND_PACKAGE_MESSAGE_DETAILS_ODBC:INTERNAL=[/usr/lib/x86_64-linux-gnu/libodbc.so][/usr/include][v()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
+//ADVANCED property for variable: ODBC_CONFIG
+ODBC_CONFIG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ODBC_INCLUDE_DIR
+ODBC_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ODBC_LIBRARY
+ODBC_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: boost_filesystem_DIR
 boost_filesystem_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: boost_headers_DIR
