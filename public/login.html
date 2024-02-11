@@ -79,7 +79,7 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="form-group">
-                <button type="submit">Login</button>
+                <button type="submit" onclick="authenticate()">Login</button>
 				<!--
 				This isn't quite right, but should be closer to a functional login
 				<a class="button" href="/Event/Login">Login</a>
@@ -89,3 +89,31 @@
     </div>
 </body>
 </html>
+
+<script>
+    function authenticate()
+    {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        
+        var params = "/Event/Login?username=" + username + "&password=" + password;
+
+        //href=params;
+        
+        fetch("/Event/Login",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({username, password})
+        })
+        .then(response => {
+            if(response.ok){
+                window.location.href = "/ReactionTest?username="+ username + "&password=" + password;
+            }
+            else{
+                alert("Incorrect Username or Password");
+            }
+        })
+    }
+</script>

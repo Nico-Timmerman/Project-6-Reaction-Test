@@ -75,8 +75,15 @@ int main() {
 				string Method = method_name(req.method);
 				if (Method == "POST") {
 					// The POST path here should be used to check the database for the user and handle the login.
-					string username = req.url_params.get("username");
-					string password = req.url_params.get("password");
+					
+					crow::json::rvalue json_body;
+					json_body = crow::json::load(req.body);
+
+					username = json_body["username"].s();
+            		password = json_body["password"].s();
+					
+					//username = req.url_params.get("username");
+					//password = req.url_params.get("password");
 				}
 				
 				string msg = "";		//Generic response message to be generated based on request
@@ -86,8 +93,18 @@ int main() {
 					// Once the Database has users in it that we can check against the following line should be switched
 					// Such that it checks if the user exists in the Database. For now it checks if user=admin & pass=admin.
 					if (username == "admin" && password == "admin"){
-						sendFile(res, "ReactionTest.html?username=admin&password=admin", "text/html");
-						result = true;
+						sendHTML(res, "ReactionTest");
+						result = true; 
+
+				
+						res.code = 200;
+						res.write(""); // Empty response body
+
+					}
+					else{
+						res.code = 401;
+						msg = "Invalid Creditials";
+						res.write(msg.c_str());
 					}
 				} else {
 					res.code = 400;
