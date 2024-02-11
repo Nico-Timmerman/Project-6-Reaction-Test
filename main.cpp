@@ -53,6 +53,10 @@ void sendStyle(response& res, string filename) { sendFile(res, "styles/" + filen
 int main() {
     SimpleApp app;
 
+	// Set log level to 
+    app.loglevel(LogLevel::Info);
+
+    // Set log handler to console
 	//ROOT ROUTE - Default login.html page
 	CROW_ROUTE(app, "/")
 		([](const request& req, response& res) { sendHTML(res, "login"); });
@@ -92,7 +96,14 @@ int main() {
 				if (EventType == "Login"){
 					// Once the Database has users in it that we can check against the following line should be switched
 					// Such that it checks if the user exists in the Database. For now it checks if user=admin & pass=admin.
-					if (username == "admin" && password == "admin"){
+					
+					initializeDatabase();
+					string passCheck = getPassword(username);
+
+					
+					CROW_LOG_WARNING << getPassword(username);
+
+					if (password == passCheck){
 						sendHTML(res, "ReactionTest");
 						result = true; 
 
@@ -124,6 +135,23 @@ int main() {
 
 				res.end();
 			});
+
+
+	CROW_ROUTE(app, "/Request/Highscore").methods(HTTPMethod::GET)
+			([](const request& req, response& res)
+			{
+
+				string username = "";
+				int highscore; 
+
+				username = req.url_params.get("username");
+				highscore = getHighScore(username);
+				
+				//return highscore;
+			});
+		
+	
+		
 
 	/* The methods in this route are methods that cannot be called within HTML due to general lacking-
 	 * browser support. OPTIONS is handled by Crow by default, as noted below this route in comments.

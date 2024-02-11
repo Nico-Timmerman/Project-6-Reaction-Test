@@ -21,6 +21,9 @@
         text-align: center;
         font-size: 32px;
     }
+    #score{
+        font-size: 32px;
+    }
 </style>
 
 
@@ -35,21 +38,41 @@
             <button id="Submit" style="display: none" onclick="submitScore()">Submit Score</button>
         </div>
         <p id="p1"></p>
+        <p id="score"></p>
     </body>
 </html>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('username');
 
         document.getElementById('p1').textContent = "Welcome back: " + username;
 
-    })
+        var url = window.location.href;
+        url = url.replace(/([&\?]password=)[^\&]+/, '');
+
+        if (url !== window.location.href) {
+                window.location.href = url;
+        }
+
+        fetch('/Request/Highscore?username=' + username)
+        .then(response => 
+        {
+            if(!response.ok)
+            {
+                throw new Error("Error");
+            }
+            return response.text;
+        })
+        .then(data => {
+            const highscore = parseInt(data);
+
+            document.getElementById('score').value = highscore;
+        });
+    }
    
 
-
-    
 
     let startTime;
     function startTimer() {
@@ -93,14 +116,16 @@
     function submitScore() {        
         //what ever needs to be done to give score to Crow
         var url = window.location.href;
-            
-        // Check if there are any parameters in the URL
-        var currentURL = window.location.href;
-        var reactionTimeParam = document.getElementById('b2').innerText;
-        //not 100% sure how to get username yet.
-        var userNameParam =  document.getElementById('username');
-        var newURL = currentURL + "?testTime=" + reactionTimeParam + "&username=" + userNameParam;
+        
+        url = url.replace(/([&\?]highscore=)[^\&]+/, '');
+        var score = document.getElementById('b2').innerText;
 
-        window.location.href = newURL;      
+        if (url.indexOf('?') !== -1) {
+            url += '&highscore=' + score;
+        } else {
+            url += '?highscore=' + score;
+        }
+
+        window.location.href = url;      
     }
 </script>
