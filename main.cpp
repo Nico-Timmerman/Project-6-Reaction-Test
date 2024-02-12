@@ -62,10 +62,10 @@ int main()
 
     // Set log handler to console
     // ROOT ROUTE - Default login.html page
-    CROW_ROUTE(app, "/")([](const request& req, response& res) { sendHTML(res, "login"); });
+    CROW_ROUTE(app, "/")([&db](const request& req, response& res) { sendHTML(res, "login"); });
 
     // defines a generic route for an HTML pages
-    CROW_ROUTE(app, "/<string>")([](const request& req, response& res, string filename)
+    CROW_ROUTE(app, "/<string>")([&db](const request& req, response& res, string filename)
         { sendHTML(res, filename); });
 
     /**** The following routes support the database-UserCreation capabilities for the web server***/
@@ -128,14 +128,14 @@ int main()
 
 
 	CROW_ROUTE(app, "/Request/Highscore").methods(HTTPMethod::GET)
-			([](const request& req, response& res)
+			([&db](const request& req, response& res)
 			{
 
 				string username = "";
 				int highscore; 
 
 				username = req.url_params.get("username");
-				highscore = getHighScore(username);
+				highscore = db.getHighScore(username);
 				
 				//return highscore;
 			});
@@ -150,7 +150,7 @@ int main()
 	 * HTML cannot call methods other than GET or POST
 	*/
 	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::DELETE, HTTPMethod::PATCH, HTTPMethod::PUT)
-		([](const request& req, response& res, string EventType)
+		([&db](const request& req, response& res, string EventType)
 			{
 				string username = "";
 				string password = "";
@@ -178,13 +178,13 @@ int main()
             bool result = false; //Result of writing event to the log file
 
 				if (EventType == "PruneUser") {
-					deleteUser(username);
+					db.deleteUser(username);
 					result = true;
 				} else if (EventType == "UpdateScore") {
-					updateHighScore(username, stoi(highscore));
+					db.updateHighScore(username, stoi(highscore));
 					result = true;
 				} else if (EventType == "CreateUser") {
-					addUser(username, email, password);
+					db.addUser(username, email, password);
 					result = true;
 				} else {
 					res.code = 400;
