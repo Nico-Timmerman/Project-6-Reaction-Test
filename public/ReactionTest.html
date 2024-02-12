@@ -56,6 +56,9 @@
                 window.location.href = url;
         }
 
+		<!--- JMeter really doesn't like something about this script. -->
+		<!--- I'm not entirely sure what or why though... --->
+		<!--- Actually it's likely because this calls a route, but this route doesn't give a response --->
         fetch('/Request/Highscore?username=' + username)
         .then(response => 
         {

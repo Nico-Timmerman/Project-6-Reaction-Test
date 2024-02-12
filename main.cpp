@@ -113,41 +113,49 @@ int main()
             res.write(msg.c_str());
         }
 
-        if (result)
-        {
-            res.code = 202;
-            msg = "<div>Event Added Successfully <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
-            res.write(msg.c_str());
-        }
-        else
-        {
-            res.code = 500;
-            msg = "INTERNAL SERVER ERROR";
-            res.write(msg.c_str());
-        }
+				if (result) {
+					res.code = 202;
+					msg = "<div> Login Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					res.write(msg.c_str());
+				} else {
+					res.code = 500;
+					msg = "INTERNAL SERVER ERROR";
+					res.write(msg.c_str());
+				}
 
         res.end();
             });
 
-    CROW_ROUTE(app, "/Request/Highscore").methods(HTTPMethod::GET)([&db](const request& req, response& res) {
-        string username = req.url_params.get("username");
-        int highscore = db.getHighScore(username);
 
-        res.write(std::to_string(highscore));
-        res.end();
-        });
+	CROW_ROUTE(app, "/Request/Highscore").methods(HTTPMethod::GET)
+			([](const request& req, response& res)
+			{
 
-    /* The methods in this route are methods that cannot be called within HTML due to general lacking-
-     * browser support. OPTIONS is handled by Crow by default, as noted below this route in comments.
-     *
-     * NEED TO FIND A WAY TO CALL THESE ROUTES (can be called easily in JMeter as far as I know).
-    */
-    CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::DELETE, HTTPMethod::PATCH, HTTPMethod::PUT)(
-        [&db](const request& req, response& res, string EventType) {
-            string username = "";
-            string password = "";
-            string email = "";
-            string highscore = "";
+				string username = "";
+				int highscore; 
+
+				username = req.url_params.get("username");
+				highscore = getHighScore(username);
+				
+				//return highscore;
+			});
+		
+	
+		
+
+	/* The methods in this route are methods that cannot be called within HTML due to general lacking-
+	 * browser support. OPTIONS is handled by Crow by default, as noted below this route in comments.
+	 * 
+	 * These routes are to be called in JMeter or other programs 
+	 * HTML cannot call methods other than GET or POST
+	*/
+	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::DELETE, HTTPMethod::PATCH, HTTPMethod::PUT)
+		([](const request& req, response& res, string EventType)
+			{
+				string username = "";
+				string password = "";
+				string email = "";
+				string highscore = "";
 
             string Method = method_name(req.method);
             if (Method == "DELETE")
@@ -169,40 +177,62 @@ int main()
             string msg = ""; //Generic response message to be generated based on request
             bool result = false; //Result of writing event to the log file
 
-            if (EventType == "PruneUser")
-            {
-                db.deleteUser(username);
-                result = true;
-            }
-            else if (EventType == "UpdateScore")
-            {
-                db.updateHighScore(username, stoi(highscore));
-                result = true;
-            }
-            else if (EventType == "CreateUser")
-            {
-                db.addUser(username, email, password);
-                result = true;
-            }
-            else
-            {
-                res.code = 400;
-                msg = "Bad Request.  No Event Type, receieved: " + EventType;
-                res.write(msg.c_str());
-            }
+				if (EventType == "PruneUser") {
+					deleteUser(username);
+					result = true;
+				} else if (EventType == "UpdateScore") {
+					updateHighScore(username, stoi(highscore));
+					result = true;
+				} else if (EventType == "CreateUser") {
+					addUser(username, email, password);
+					result = true;
+				} else {
+					res.code = 400;
+					msg = "Bad Request.  No Event Type, receieved: " + EventType;
+					res.write(msg.c_str());
+				}
 
-            if (result)
-            {
-                res.code = 202;
-                msg = "<div>Event Successfully Updated <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
-                res.write(msg.c_str());
-            }
-            else
-            {
-                res.code = 500;
-                msg = "INTERNAL SERVER ERROR";
-                res.write(msg.c_str());
-            }
+				if (result) {
+					res.code = 202;
+					msg = "<div>Action Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					res.write(msg.c_str());
+				} else {
+					res.code = 500;
+					msg = "INTERNAL SERVER ERROR";
+					res.write(msg.c_str());
+				}
+
+				res.end();
+			});
+
+	/*
+	// Ignore this code!
+	// Crow handles Options automatically!
+	// https://crowcpp.org/master/guides/routes/
+	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::OPTIONS)
+		([](const request& req, response& res, string EventType)
+			{
+				if (EventType == "Options")
+					result = true;
+				else
+				{
+					res.code = 400;
+					msg = "Bad Request.  No Event Type, receieved: " + EventType;
+					res.write(msg.c_str());
+				}
+				
+				if (result)
+				{
+					res.code = 202;
+					msg = "<div> Success! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					res.write(msg.c_str());
+				}
+				else
+				{
+					res.code = 500;
+					msg = "INTERNAL SERVER ERROR";
+					res.write(msg.c_str());
+				}
 
             res.end();
         });
