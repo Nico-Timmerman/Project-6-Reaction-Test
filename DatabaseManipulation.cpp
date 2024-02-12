@@ -1,127 +1,179 @@
 #include "DatabaseManipulation.h"
-#include <sql.h>
-#include <sqlext.h>
+#include <iostream>
 #include <stdexcept>
-#include <string>
 
-// Global variables for database handles
-SQLHENV henv = SQL_NULL_HENV;
-SQLHDBC hdbc = SQL_NULL_HDBC;
-SQLHSTMT hstmt = SQL_NULL_HSTMT;
+// Constructor
+DatabaseManipulation::DatabaseManipulation() {
+    std::cout << "Initializing database..." << std::endl;
+    if (sqlite3_open("mydatabase.db", &db) != SQLITE_OK) {
+        std::cerr << "Error opening database: " << sqlite3_errmsg(db) << std::endl;
+    }
+    else {
+        std::cout << "Database opened successfully." << std::endl;
+    }
+    initializeDatabase(); // Assuming this sets up tables, etc.
+}
 
-void initializeDatabase() {
-    SQLRETURN retcode;
+// Destructor
+DatabaseManipulation::~DatabaseManipulation() {
+    sqlite3_close(db);
+}
 
-    // Allocate an environment handle
-    retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
-    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
-        throw std::runtime_error("Failed to allocate environment handle");
+// Initialize the database and create tables if they don't exist
+void DatabaseManipulation::initializeDatabase() {
+    const char* createTableSQL =
+        "CREATE TABLE IF NOT EXISTS users ("
+        "username TEXT PRIMARY KEY, "
+        "email TEXT NOT NULL, "
+        "password TEXT NOT NULL);"
+        "CREATE TABLE IF NOT EXISTS scores ("
+        "username TEXT PRIMARY KEY, "
+        "high_score INTEGER NOT NULL, "
+        "FOREIGN KEY(username) REFERENCES users(username));";
+
+    char* errorMessage;
+    if (sqlite3_exec(db, createTableSQL, nullptr, nullptr, &errorMessage) != SQLITE_OK) {
+        throw std::runtime_error("Failed to create tables: " + std::string(errorMessage));
+        sqlite3_free(errorMessage);
     }
 
-    // Set the ODBC version to 3.0
-    retcode = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
-    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
-        SQLFreeHandle(SQL_HANDLE_ENV, henv);
-        throw std::runtime_error("Failed to set ODBC version environment attribute");
-    }
+    seedDatabase(); // Seed the database with initial data
+}
 
-    // Allocate a connection handle
-    retcode = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
-        SQLFreeHandle(SQL_HANDLE_ENV, henv);
-        throw std::runtime_error("Failed to allocate connection handle");
-    }
+// Seed the database with test data
+void DatabaseManipulation::seedDatabase() {
+    const char* seedDataSQL =
+        "INSERT OR IGNORE INTO users (username, email, password) VALUES "
+        "('testUser', 'testEmail@example.com', 'testPassword'),"
+        "('sampleUser', 'sampleEmail@example.com', 'samplePassword');"
+        "INSERT OR IGNORE INTO scores (username, high_score) VALUES "
+        "('testUser', 1000),"
+        "('sampleUser', 2000);";
 
-    // Define the connection string
-    std::string connStr = "Driver={ODBC Driver 17 for SQL Server};"
-        "Server=tcp:project6group5-server.database.windows.net,1433;"
-        "Database=Project6Group5DB;"
-        "Uid=group5Guest;"
-        "Pwd=gr0up5Gu3st;"
-        "Encrypt=yes;"
-        "TrustServerCertificate=no;"
-        "Connection Timeout=30;";
-
-    SQLSMALLINT outConnStrLength = 0;
-
-    // Connect to the database
-    retcode = SQLDriverConnect(hdbc, NULL, (SQLCHAR*)connStr.c_str(), SQL_NTS, NULL, 0, &outConnStrLength, SQL_DRIVER_NOPROMPT);
-    if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
-        SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-        SQLFreeHandle(SQL_HANDLE_ENV, henv);
-        throw std::runtime_error("Failed to connect to the database");
+    char* errorMessage;
+    if (sqlite3_exec(db, seedDataSQL, nullptr, nullptr, &errorMessage) != SQLITE_OK) {
+        throw std::runtime_error("Failed to seed database: " + std::string(errorMessage));
+        sqlite3_free(errorMessage);
     }
 }
 
-int getHighScore(const std::string& username) {
-    SQLRETURN retcode;
-    std::string query = "SELECT HighScore FROM UserInfo WHERE Username = '" + username + "'";
-    retcode = SQLExecDirect(hstmt, (SQLCHAR*)query.c_str(), SQL_NTS);
+// Add a new user to the database
+bool DatabaseManipulation::addUser(const std::string& username, const std::string& email, const std::string& password) {
+    const char* insertSQL = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);";
 
-    int highScore = -1;
-    if (SQL_SUCCEEDED(retcode)) {
-        if (SQL_SUCCEEDED(SQLFetch(hstmt))) { // Ensure SQLFetch is called before SQLGetData
-            SQLGetData(hstmt, 1, SQL_C_SLONG, &highScore, 0, NULL);
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, insertSQL, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, email.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, password.c_str(), -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Failed to execute statement: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    return true;
+}
+// Get the high score for a given user
+int DatabaseManipulation::getHighScore(const std::string& username) {
+    const char* query = "SELECT high_score FROM scores WHERE username = ?;";
+    sqlite3_stmt* stmt;
+    int highScore = -1; // Default value if not found
+
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            highScore = sqlite3_column_int(stmt, 0);
         }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
     }
 
     return highScore;
 }
 
-std::string getPassword(const std::string& username) {
-    SQLCHAR dbPassword[100];
-    SQLLEN ind;
-    std::string query = "SELECT Password FROM UserInfo WHERE Username = '" + username + "'";
-    SQLExecDirect(hstmt, (SQLCHAR*)query.c_str(), SQL_NTS);
+// Get the password for a given user
+std::string DatabaseManipulation::getPassword(const std::string& username) {
+    const char* query = "SELECT password FROM users WHERE username = ?;";
+    sqlite3_stmt* stmt;
+    std::string password; // Empty string if not found
 
-    std::string password;
-    if (SQL_SUCCEEDED(SQLFetch(hstmt))) {
-        SQLGetData(hstmt, 1, SQL_C_CHAR, dbPassword, sizeof(dbPassword), &ind);
-        if (ind != SQL_NULL_DATA) password.assign(reinterpret_cast<char*>(dbPassword));
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            password = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
     }
 
     return password;
 }
 
-std::string getEmail(const std::string& username) {
-    SQLCHAR dbEmail[100];
-    SQLLEN ind;
-    std::string query = "SELECT Email FROM UserInfo WHERE Username = '" + username + "'";
-    SQLExecDirect(hstmt, (SQLCHAR*)query.c_str(), SQL_NTS);
+// Update the high score for a given user
+bool DatabaseManipulation::updateHighScore(const std::string& username, int newHighScore) {
+    const char* query = "UPDATE scores SET high_score = ? WHERE username = ?;";
+    sqlite3_stmt* stmt;
 
-    std::string email;
-    if (SQL_SUCCEEDED(SQLFetch(hstmt))) {
-        SQLGetData(hstmt, 1, SQL_C_CHAR, dbEmail, sizeof(dbEmail), &ind);
-        if (ind != SQL_NULL_DATA) email.assign(reinterpret_cast<char*>(dbEmail));
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, newHighScore);
+        sqlite3_bind_text(stmt, 2, username.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            std::cerr << "Failed to execute statement: " << sqlite3_errmsg(db) << std::endl;
+            sqlite3_finalize(stmt);
+            return false;
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return false;
     }
 
-    return email;
+    return true;
 }
 
-int addUser(const std::string& username, const std::string& email, const std::string& password) {
-    std::string query = "INSERT INTO UserInfo (Username, Email, Password, HighScore) VALUES ('" +
-                        username + "', '" + email + "', '" + password + "', 0)";
-    SQLExecDirect(hstmt, (SQLCHAR*)query.c_str(), SQL_NTS);
-    return SQL_SUCCEEDED(SQLFetch(hstmt)) ? 0 : -1;
+// Delete a user from the database
+bool DatabaseManipulation::deleteUser(const std::string& username) {
+    const char* query = "DELETE FROM users WHERE username = ?;";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            std::cerr << "Failed to execute statement: " << sqlite3_errmsg(db) << std::endl;
+            sqlite3_finalize(stmt);
+            return false;
+        }
+        sqlite3_finalize(stmt);
+    }
+    else {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
-int updateHighScore(const std::string& username, int newHighScore) {
-    std::string query = "UPDATE UserInfo SET HighScore = " + std::to_string(newHighScore) +
-                        " WHERE Username = '" + username + "'";
-    SQLExecDirect(hstmt, (SQLCHAR*)query.c_str(), SQL_NTS);
-    return SQL_SUCCEEDED(SQLFetch(hstmt)) ? 0 : -1;
+void DatabaseManipulation::finalizeDatabase() {
+    if (db != nullptr) {
+        sqlite3_close(db);
+        db = nullptr; // Ensure the pointer is no longer used
+    }
 }
 
-int deleteUser(const std::string& username) {
-    std::string query = "DELETE FROM UserInfo WHERE Username = '" + username + "'";
-    SQLExecDirect(hstmt, (SQLCHAR*)query.c_str(), SQL_NTS);
-    return SQL_SUCCEEDED(SQLFetch(hstmt)) ? 0 : -1;
-}
 
-// Finalize database
-void finalizeDatabase() {
-    SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-    SQLDisconnect(hdbc);
-    SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-    SQLFreeHandle(SQL_HANDLE_ENV, henv);
-}
