@@ -56,6 +56,8 @@
                 window.location.href = url;
         }
 
+		<!--- JMeter really doesn't like something about this script. -->
+		<!--- I'm not entirely sure what or why though... --->
         fetch('/Request/Highscore?username=' + username)
         .then(response => 
         {

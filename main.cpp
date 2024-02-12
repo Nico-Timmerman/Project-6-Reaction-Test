@@ -125,7 +125,7 @@ int main() {
 
 				if (result) {
 					res.code = 202;
-					msg = "<div>Event Added Successfully <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					msg = "<div> Login Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
 					res.write(msg.c_str());
 				} else {
 					res.code = 500;
@@ -156,7 +156,8 @@ int main() {
 	/* The methods in this route are methods that cannot be called within HTML due to general lacking-
 	 * browser support. OPTIONS is handled by Crow by default, as noted below this route in comments.
 	 * 
-	 * NEED TO FIND A WAY TO CALL THESE ROUTES (can be called easily in JMeter as far as I know).
+	 * These routes are to be called in JMeter or other programs 
+	 * HTML cannot call methods other than GET or POST
 	*/
 	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::DELETE, HTTPMethod::PATCH, HTTPMethod::PUT)
 		([](const request& req, response& res, string EventType)
@@ -201,7 +202,7 @@ int main() {
 
 				if (result) {
 					res.code = 202;
-					msg = "<div>Event Successfully Updated <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					msg = "<div>Action Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
 					res.write(msg.c_str());
 				} else {
 					res.code = 500;
@@ -231,7 +232,7 @@ int main() {
 				if (result)
 				{
 					res.code = 202;
-					msg = "<div>Event Successfully Updated <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+					msg = "<div> Success! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
 					res.write(msg.c_str());
 				}
 				else
