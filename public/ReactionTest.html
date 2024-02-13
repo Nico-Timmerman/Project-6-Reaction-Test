@@ -49,6 +49,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('username');
 
+        getHighScore(username);
+
         //Set text to the Username
         document.getElementById('p1').textContent = "Welcome back: " + username;
 
@@ -56,36 +58,40 @@
         var url = window.location.href;
         url = url.replace(/([&\?]password=)[^\&]+/, '');
 
-        //redirect to url without password in it
-        if (url !== window.location.href) {
-                window.location.href = url;
-        }
+        
 
         //<!--- JMeter really doesn't like something about this script. -->
 		//<!--- I'm not entirely sure what or why though... --->
 		//<!--- Actually it's likely because this calls a route, but this route doesn't give a response --->
         //I Believe Jmeter should be happy with it now (hopefully) -Nico T.
 
-
         //gets the highscore from the DB
-        //TODO: format using JSON
-        fetch('/Request/Highscore?username=' + username)
+        
+
+        //redirect to url without password in it
+        if (url !== window.location.href) {
+                window.location.href = url;
+        }
+		
+    }
+    function getHighScore(username)
+    {
+        fetch("/Request/Highscore?username=" + username)
         .then(response => 
         {
+            
             if(!response.ok)
             {
                 throw new Error("Error");
             }
-            return response.text();
+            return response.json();
         })
         .then(data => {
             //get the highscore from the response and update the Text with it
-            const highscore = parseInt(data);
+            const highscore = parseInt(data.highscore);
             const scoreText = document.getElementById('score');
             scoreText.textContent = 'Highscore: ' + highscore;
         });
-
-		
     }
 
     //start time needs to be difined here to ensure it is scope of multiple functions

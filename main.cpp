@@ -131,16 +131,17 @@ int main()
 			([&db](const request& req, response& res)
 			{
 
-				string username = "";
+                string username = req.url_params.get("username");
 				int highscore; 
-
-				username = req.url_params.get("username");
 				highscore = db.getHighScore(username);
 				
-                //CROW_LOG_ERROR << highscore;
+                json::wvalue jsonResponse;
+                
+                jsonResponse["highscore"] = highscore;
 
-				res.set_header("Content-Type", "text/plain");
-                res.write(std::to_string(highscore));
+
+				res.set_header("Content-Type", "application/json");
+                res.write(jsonResponse.dump());
                 res.end();
 			});
 		
