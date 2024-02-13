@@ -137,7 +137,7 @@ int main()
 				username = req.url_params.get("username");
 				highscore = db.getHighScore(username);
 				
-                CROW_LOG_ERROR << highscore;
+                //CROW_LOG_ERROR << highscore;
 
 				res.set_header("Content-Type", "text/plain");
                 res.write(std::to_string(highscore));
@@ -162,6 +162,7 @@ int main()
 				string highscore = "";
 
             string Method = method_name(req.method);
+            CROW_LOG_INFO << Method;
             if (Method == "DELETE")
             {
                 username = req.url_params.get("username");
@@ -174,11 +175,14 @@ int main()
             }
             else
             {
+                CROW_LOG_INFO << "Inside Else Clause";
                 crow::json::rvalue json_body;
                 json_body = crow::json::load(req.body);
 
                 username = json_body["username"].s();
-                highscore = json_body["highscore"].s();
+                highscore = json_body["score"].s();
+
+                CROW_LOG_INFO << username + highscore;
             }
 
             string msg = ""; //Generic response message to be generated based on request
