@@ -113,18 +113,18 @@ int main()
             res.write(msg.c_str());
         }
 
-				if (result) {
-					res.code = 202;
-					msg = "<div> Login Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
-					res.write(msg.c_str());
-				} else {
-					res.code = 500;
-					msg = "INTERNAL SERVER ERROR";
-					res.write(msg.c_str());
-				}
+        if (result) {
+            res.code = 202;
+            msg = "<div> Login Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+            res.write(msg.c_str());
+        } else {
+            res.code = 500;
+            msg = "INTERNAL SERVER ERROR";
+            res.write(msg.c_str());
+        }
 
         res.end();
-            });
+        });
 
 
 	CROW_ROUTE(app, "/Request/Highscore").methods(HTTPMethod::GET)
@@ -137,7 +137,11 @@ int main()
 				username = req.url_params.get("username");
 				highscore = db.getHighScore(username);
 				
-				//return highscore;
+                CROW_LOG_ERROR << highscore;
+
+				res.set_header("Content-Type", "text/plain");
+                res.write(std::to_string(highscore));
+                res.end();
 			});
 		
 	
@@ -170,8 +174,11 @@ int main()
             }
             else
             {
-                username = req.url_params.get("username");
-                highscore = req.url_params.get("highscore");
+                crow::json::rvalue json_body;
+                json_body = crow::json::load(req.body);
+
+                username = json_body["username"].s();
+                highscore = json_body["highscore"].s();
             }
 
             string msg = ""; //Generic response message to be generated based on request
@@ -183,6 +190,9 @@ int main()
 				} else if (EventType == "UpdateScore") {
 					db.updateHighScore(username, stoi(highscore));
 					result = true;
+
+                    res.code = 200;
+                    res.write("");
 				} else if (EventType == "CreateUser") {
 					db.addUser(username, email, password);
 					result = true;

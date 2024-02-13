@@ -56,9 +56,10 @@
                 window.location.href = url;
         }
 
-		<!--- JMeter really doesn't like something about this script. -->
-		<!--- I'm not entirely sure what or why though... --->
-		<!--- Actually it's likely because this calls a route, but this route doesn't give a response --->
+        //alert(username);
+        //<!--- JMeter really doesn't like something about this script. -->
+		//<!--- I'm not entirely sure what or why though... --->
+		//<!--- Actually it's likely because this calls a route, but this route doesn't give a response --->
         fetch('/Request/Highscore?username=' + username)
         .then(response => 
         {
@@ -66,15 +67,17 @@
             {
                 throw new Error("Error");
             }
-            return response.text;
+            return response.text();
         })
         .then(data => {
             const highscore = parseInt(data);
-
-            document.getElementById('score').value = highscore;
+            //alert(highscore);
+            const scoreText = document.getElementById('score');
+            scoreText.textContent = 'Highscore: ' + highscore;
         });
+
+		
     }
-   
 
 
     let startTime;
@@ -128,6 +131,39 @@
         } else {
             url += '?highscore=' + score;
         }
+
+
+        const scoreText = document.getElementById('score').textContent;
+        const halves = scoreText.split(':');
+        const highScore = parseInt(halves[1].trim());
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        if(score < highScore)
+        {
+            fetch("/Event/UpdateScore",{
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({username, score})
+        })
+            .then(response => {
+                if(response.ok){
+
+                    alert("Score Updated");
+                }
+                else{
+                    alert("Incorrect Username or Password");
+                }
+        })
+        }
+        else
+        {
+            alert("Did not beat highscore.");
+        }
+
+
 
         window.location.href = url;      
     }
