@@ -24,6 +24,18 @@
     #score{
         font-size: 32px;
     }
+    #confirmButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    
+    }
 </style>
 
 
@@ -37,12 +49,43 @@
             <button id="b2" class="buttons button2" style="display:none" onclick="stopTimer()">Click!</button>
             <button id="Submit" style="display: none" onclick="submitScore()">Submit Score</button>
         </div>
+        <button id="confirmButton">Delete Account</button>
         <p id="p1"></p>
         <p id="score"></p>
     </body>
 </html>
 
 <script>
+
+    document.getElementById("confirmButton").addEventListener("click", function() {
+        // Display confirmation popup
+        var confirmed = confirm("ARE YOU SURE YOU WANT TO DELETE YOUR ACCOUNT (this action cannot be undone)");
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        // If user confirms, do something
+        if (confirmed) {
+            //package data into JSON
+            fetch("/Event/PruneUser",{
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({username})
+            })
+            //check for an ok response and inform the user as needed
+            .then(response => {
+                if(response.ok){
+                    alert("User Deleted");
+                    window.location.href = "/login";
+                }
+                else{
+                    alert("Failed to Delete");
+                }
+            });
+        } else {
+            
+        }
+    });
     //after the window has loaded
     window.onload = function() {
         //get user name param from URL
@@ -171,8 +214,8 @@
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({username, score})
-        })
-        //check for an ok response and inform the user as needed
+            })
+            //check for an ok response and inform the user as needed
             .then(response => {
                 if(response.ok){
 

@@ -55,6 +55,7 @@ int main()
     // Create an instance of DatabaseManipulation
     DatabaseManipulation db;
     db.initializeDatabase();
+    db.seedDatabase();
 
 
     // Set log level to
@@ -166,7 +167,10 @@ int main()
             CROW_LOG_INFO << Method;
             if (Method == "DELETE")
             {
-                username = req.url_params.get("username");
+                crow::json::rvalue json_body;
+                json_body = crow::json::load(req.body);
+
+                username = json_body["username"].s();
             }
             else if (Method == "PUT")
             {
@@ -189,36 +193,48 @@ int main()
             string msg = ""; //Generic response message to be generated based on request
             bool result = false; //Result of writing event to the log file
 
-				if (EventType == "PruneUser") {
-					db.deleteUser(username);
-					result = true;
-				} else if (EventType == "UpdateScore") {
-					db.updateHighScore(username, stoi(highscore));
-					result = true;
+            if (EventType == "PruneUser") {
+                
+                if(db.deleteUser(username))
+                {
+                    sendHTML(res, "login");
+                    result = true;
 
                     res.code = 200;
-                    res.write("");
-				} else if (EventType == "CreateUser") {
-					db.addUser(username, email, password);
-					result = true;
-				} else {
-					res.code = 400;
-					msg = "Bad Request.  No Event Type, receieved: " + EventType;
-					res.write(msg.c_str());
-				}
+                    res.write(""); // Empty response body
+                }
+                else
+                {
+                    result = false;
+                }
 
-				if (result) {
-					res.code = 202;
-					msg = "<div>Action Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
-					res.write(msg.c_str());
-				} else {
-					res.code = 500;
-					msg = "INTERNAL SERVER ERROR";
-					res.write(msg.c_str());
-				}
+            } else if (EventType == "UpdateScore") {
+                db.updateHighScore(username, stoi(highscore));
+                result = true;
 
-				res.end();
-			});
+                res.code = 200;
+                res.write("");
+            } else if (EventType == "CreateUser") {
+                db.addUser(username, email, password);
+                result = true;
+            } else {
+                res.code = 400;
+                msg = "Bad Request.  No Event Type, receieved: " + EventType;
+                res.write(msg.c_str());
+            }
+
+            if (result) {
+                res.code = 202;
+                msg = "<div>Action Successful! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
+                res.write(msg.c_str());
+            } else {
+                res.code = 500;
+                msg = "INTERNAL SERVER ERROR";
+                res.write(msg.c_str());
+            }
+
+            res.end();
+		});
 
 	/*
 	// Ignore this code!
