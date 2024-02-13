@@ -43,23 +43,32 @@
 </html>
 
 <script>
+    //after the window has loaded
     window.onload = function() {
+        //get user name param from URL
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('username');
 
+        //Set text to the Username
         document.getElementById('p1').textContent = "Welcome back: " + username;
 
+        //remove the password from the url as it is not needed
         var url = window.location.href;
         url = url.replace(/([&\?]password=)[^\&]+/, '');
 
+        //redirect to url without password in it
         if (url !== window.location.href) {
                 window.location.href = url;
         }
 
-        //alert(username);
         //<!--- JMeter really doesn't like something about this script. -->
 		//<!--- I'm not entirely sure what or why though... --->
 		//<!--- Actually it's likely because this calls a route, but this route doesn't give a response --->
+        //I Believe Jmeter should be happy with it now (hopefully) -Nico T.
+
+
+        //gets the highscore from the DB
+        //TODO: format using JSON
         fetch('/Request/Highscore?username=' + username)
         .then(response => 
         {
@@ -70,8 +79,8 @@
             return response.text();
         })
         .then(data => {
+            //get the highscore from the response and update the Text with it
             const highscore = parseInt(data);
-            //alert(highscore);
             const scoreText = document.getElementById('score');
             scoreText.textContent = 'Highscore: ' + highscore;
         });
@@ -79,68 +88,77 @@
 		
     }
 
-
+    //start time needs to be difined here to ensure it is scope of multiple functions
     let startTime;
     function startTimer() {
+        //sets a start time
         startTime = new Date().getTime();
-        //alert("timer started");
     }
-    function stopTimer() {
 
+    function stopTimer() {
+        //stops the timer apon the click of the button
         const endTime = new Date().getTime();
-        //alert("Alert 1");
         var time = endTime - startTime;
-        //alert("Alert 2");
        
         var secondButton = document.getElementById('b2');
         
+        //updates text of the button to be the reaction time
         secondButton.innerText = time.toLocaleString();
         secondButton.style.backgroundColor = 'forestgreen';
 
+        //reveals the submit button
         document.getElementById('Submit').style.display = 'block';
         
     }
 
     function unhideButton() {
+        //prompt user that the game is about to begin
         document.getElementById('b').innerText = "Get Ready!";
 
+        //sets a delay of a random time between 3 and 7 seconds (arbitrary numbers that felt right to me)
         setTimeout(startGame, getNumberBetweenThreeAndSeven());
 
     }
     function startGame() {
+        //hide the initial Button and unhide the the button that records click time
         document.getElementById('b').style.display = 'none';
         document.getElementById('b2').style.display = 'block';
+        //begin timer
         startTimer();
     }
 
     function getNumberBetweenThreeAndSeven() {
+        //^function name lol
         return (Math.random() * (7 - 3) + 1) * 1000;
     }
-    function randomColors() {
-        return '#' + Math.floor(Math.random() * 16777215).toString(16);
-    }
+
     function submitScore() {        
-        //what ever needs to be done to give score to Crow
+        //get teh current URL
         var url = window.location.href;
         
+        //replace highscore with the most recent score (highscore is bad var name here whoops)
         url = url.replace(/([&\?]highscore=)[^\&]+/, '');
         var score = document.getElementById('b2').innerText;
 
+        //ensure the correct preceeding char is added to the parameter
         if (url.indexOf('?') !== -1) {
             url += '&highscore=' + score;
         } else {
             url += '?highscore=' + score;
         }
 
-
+        //Get highscore from the Highscore text object
         const scoreText = document.getElementById('score').textContent;
         const halves = scoreText.split(':');
         const highScore = parseInt(halves[1].trim());
 
+        //get the username from the url
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('username');
+        //varify the highscore was beaten (no need to update if it is not beaten)
         if(score < highScore)
         {
+            //package data into JSON
             fetch("/Event/UpdateScore",{
             method: "PATCH",
             headers: {
@@ -148,6 +166,7 @@
             },
             body: JSON.stringify({username, score})
         })
+        //check for an ok response and inform the user as needed
             .then(response => {
                 if(response.ok){
 
@@ -164,7 +183,7 @@
         }
 
 
-
+        //redirect to a new url that contains the most recent score
         window.location.href = url;      
     }
 </script>
