@@ -140,7 +140,7 @@ int main()
                 
                 jsonResponse["highscore"] = highscore;
 
-
+                res.code = 202;
 				res.set_header("Content-Type", "application/json");
                 res.write(jsonResponse.dump());
                 res.end();
