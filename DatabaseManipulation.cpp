@@ -59,10 +59,11 @@ void DatabaseManipulation::seedDatabase() {
 
 // Add a new user to the database
 bool DatabaseManipulation::addUser(const std::string& username, const std::string& email, const std::string& password) {
-    const char* insertSQL = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);";
+    // First, insert the new user into the users table
+    const char* insertUserSQL = "INSERT INTO users (username, email, password) VALUES (?, ?, ?);";
 
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, insertSQL, -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, insertUserSQL, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
         return false;
     }
@@ -78,8 +79,27 @@ bool DatabaseManipulation::addUser(const std::string& username, const std::strin
     }
 
     sqlite3_finalize(stmt);
+
+    // Insert the new user into the scores table
+    const char* insertScoreSQL = "INSERT INTO scores (username, high_score) VALUES (?, 0);"; // Default high score (0)
+
+    if (sqlite3_prepare_v2(db, insertScoreSQL, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare statement for scores: " << sqlite3_errmsg(db) << std::endl;
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        std::cerr << "Failed to execute statement for scores: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
     return true;
 }
+
 // Get the high score for a given user
 int DatabaseManipulation::getHighScore(const std::string& username) {
     const char* query = "SELECT high_score FROM scores WHERE username = ?;";
