@@ -145,7 +145,36 @@ int main()
                 res.write(jsonResponse.dump());
                 res.end();
 			});
-		
+	
+
+    CROW_ROUTE(app, "/Request/adduser").methods(HTTPMethod::POST)
+			([&db](const request& req, response& res)
+			{
+                CROW_LOG_CRITICAL << "in Put";
+                
+                string username = "";
+				string password = "";
+			    string email = "";
+            				
+                
+                crow::json::rvalue json_body;
+                json_body = crow::json::load(req.body);
+
+                username = json_body["username"].s();
+                password = json_body["password"].s();
+                email = "";
+                
+                
+
+                db.addUser(username, email, password);
+
+                sendHTML(res, "ReactionTest");
+                //res.code = 200;
+
+                res.code = 200;
+				
+                res.end();
+			});
 	
 		
 
@@ -164,7 +193,7 @@ int main()
 				string highscore = "";
 
             string Method = method_name(req.method);
-            CROW_LOG_INFO << Method;
+            CROW_LOG_CRITICAL << Method;
             if (Method == "DELETE")
             {
                 crow::json::rvalue json_body;
@@ -174,9 +203,14 @@ int main()
             }
             else if (Method == "PUT")
             {
-                username = req.url_params.get("username");
-                password = req.url_params.get("password");
-                email = req.url_params.get("email");
+                crow::json::rvalue json_body;
+                json_body = crow::json::load(req.body);
+
+                username = json_body["username"].s();
+                password = json_body["password"].s();
+                email = "";
+                
+                CROW_LOG_CRITICAL << "in Put";
             }
             else
             {
@@ -187,7 +221,7 @@ int main()
                 username = json_body["username"].s();
                 highscore = json_body["score"].s();
 
-                CROW_LOG_INFO << username + highscore;
+                CROW_LOG_CRITICAL << username + highscore;
             }
 
             string msg = ""; //Generic response message to be generated based on request
@@ -216,6 +250,12 @@ int main()
                 res.write("");
             } else if (EventType == "CreateUser") {
                 db.addUser(username, email, password);
+
+                sendHTML(res, "ReactionTest");
+                res.code = 200;
+
+                CROW_LOG_INFO << "In Create";
+
                 result = true;
             } else {
                 res.code = 400;

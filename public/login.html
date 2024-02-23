@@ -80,17 +80,49 @@
             </div>
             <div class="form-group">
                 <button type="submit" onclick="authenticate()">Login</button>
+                
 				<!--
 				This isn't quite right, but should be closer to a functional login
 				<a class="button" href="/Event/Login">Login</a>
 				-->
             </div>
+            
         </form>
     </div>
+    <button id="addUser" onclick="addUser()">Add User</button>
 </body>
 </html>
 
 <script>
+    function addUser()
+    {
+        alert("Clicked");
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+
+        alert(username + password);
+        fetch("/Request/adduser",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({username, password})
+            })
+            //check for an ok response and inform the user as needed
+            .then(response => {
+                if(response.ok){
+                    alert("account added");
+                    window.location.href = "/ReactionTest?username="+ username;
+                }
+                else{
+                    alert("Failed to add");
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                alert("Failed to add: " + error.message);
+            });
+    }
     function authenticate()
     {
         var username = document.getElementById('username').value;
