@@ -96,11 +96,11 @@
 <script>
     function addUser()
     {
-        alert("Clicked");
+        //alert("Clicked");
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
 
-        alert(username + password);
+        //alert(username + password);
         fetch("/Request/adduser",{
             method: "POST",
             headers: {

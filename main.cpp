@@ -163,15 +163,17 @@ int main()
                 username = json_body["username"].s();
                 password = json_body["password"].s();
                 email = "";
+
+                if (db.addUser(username, email, password))
+                {
+                    sendHTML(res, "ReactionTest");
+
+                    res.code = 200;
+                }
+                else{
+                    res.code = 400;
+                }
                 
-                
-
-                db.addUser(username, email, password);
-
-                sendHTML(res, "ReactionTest");
-                //res.code = 200;
-
-                res.code = 200;
 				
                 res.end();
 			});

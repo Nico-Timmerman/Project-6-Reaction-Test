@@ -205,7 +205,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('username');
         //varify the highscore was beaten (no need to update if it is not beaten)
-        if(score < highScore)
+        if(score < highScore || highScore === 0)
         {
             //package data into JSON
             fetch("/Event/UpdateScore",{
