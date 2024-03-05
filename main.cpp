@@ -203,17 +203,7 @@ int main()
 
                 username = json_body["username"].s();
             }
-            else if (Method == "PUT")
-            {
-                crow::json::rvalue json_body;
-                json_body = crow::json::load(req.body);
-
-                username = json_body["username"].s();
-                password = json_body["password"].s();
-                email = "";
-                
-                CROW_LOG_CRITICAL << "in Put";
-            }
+            
             else
             {
                 CROW_LOG_INFO << "Inside Else Clause";
@@ -250,16 +240,7 @@ int main()
 
                 res.code = 200;
                 res.write("");
-            } else if (EventType == "CreateUser") {
-                db.addUser(username, email, password);
-
-                sendHTML(res, "ReactionTest");
-                res.code = 200;
-
-                CROW_LOG_INFO << "In Create";
-
-                result = true;
-            } else {
+            }  else {
                 res.code = 400;
                 msg = "Bad Request.  No Event Type, receieved: " + EventType;
                 res.write(msg.c_str());
@@ -278,37 +259,7 @@ int main()
             res.end();
 		});
 
-	/*
-	// Ignore this code!
-	// Crow handles Options automatically!
-	// https://crowcpp.org/master/guides/routes/
-	CROW_ROUTE(app, "/Event/<string>").methods(HTTPMethod::OPTIONS)
-		([](const request& req, response& res, string EventType)
-			{
-				if (EventType == "Options")
-					result = true;
-				else
-				{
-					res.code = 400;
-					msg = "Bad Request.  No Event Type, receieved: " + EventType;
-					res.write(msg.c_str());
-				}
-				
-				if (result)
-				{
-					res.code = 202;
-					msg = "<div> Success! <a href=\"http://localhost:23500\"> RETURN HOME </a></div>";
-					res.write(msg.c_str());
-				}
-				else
-				{
-					res.code = 500;
-					msg = "INTERNAL SERVER ERROR";
-					res.write(msg.c_str());
-				}
-
-            res.end();
-        });
+	
 
     /********* Standard routes to support styles and images *********/
     CROW_ROUTE(app, "/styles/<string>")([](const request& req, response& res, string filename) { sendStyle(res, filename); });
